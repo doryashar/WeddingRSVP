@@ -63,7 +63,7 @@ WEDDING_INVITES
 wedding_id - 
 gift - 
 notes -
-coming -
+confirmed -
 vegis - 
 guest_requests - 
 
@@ -80,4 +80,4 @@ MSGID - last sent message delivery ID.
 STATUS - last sent message delivery status: trying, failed, delivery-error, sent, delivered, read.
 TIMESTAMP - last update timestamp
 time - created time
-message_history - [(timestamp, id, message, status)...]
+history - [(timestamp, id, message, status)...]
