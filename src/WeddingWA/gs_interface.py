@@ -3,7 +3,7 @@ from fastapi import Response, Request
 
 # ==================================================================
 async def update_row_with_form_answer(answers):
-    try:    
+    try:
         docname = "Family Reunion RSVP Form"
         sh = gc.open(docname)
         wks = sh.get_worksheet(1)
@@ -13,7 +13,8 @@ async def update_row_with_form_answer(answers):
             raise Exception(f"phone: {answers['phone']} was found {len(item)} times")
         else:
             logging.debug(f"Found item {item} for answers: {answers}") 
-            
+        
+        logging.info(f"Updating spreadsheet {docname} with {answers}") 
         loc = item.index[0]
         for a,b in answers.items():
             dataframe.loc[loc, a] = b

@@ -75,7 +75,7 @@ async def got_new_form_update(request: Request):
     rj = await request.json()
     answers = {q['name']:str(q['value']).strip() for q in rj['submission']['questions']}
     answers = convert_form_to_row(answers)
-    logging.info("Received update_row req with path_params: %s, query_params: %s, json: %s", path_params, params, rj)
+    logging.debug("Received update_row req with path_params: %s, query_params: %s, json: %s", path_params, params, rj)
     await gs.update_row_with_form_answer(answers)
     if not await db.update_row(**answers):
         return Response(status_code=404, content="Error occured")
