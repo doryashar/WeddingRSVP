@@ -1,8 +1,6 @@
 # db_interface.py
 
 import logging
-from fastapi.responses import RedirectResponse
-from fastapi import Response, Request
 import os, time
 from datetime import datetime
 from supabase import create_client, Client
@@ -13,8 +11,8 @@ username: str = os.environ.get("SUPABASE_USER")
 password: str = os.environ.get("SUPABASE_PASS")
 
 supabase: Client = create_client(url, key)
-session = supabase.auth.sign_in(username, password)
-supabase.postgrest.auth(session.access_token)
+session = supabase.auth.sign_in_with_password(dict(email=username, password=password))
+#supabase.postgrest.auth(session.access_token)
 
 WEDDING_TABLE = "wedding_statuses"
 MESSAGES_TABLE = "whatsapp_messages" # For unknown phone

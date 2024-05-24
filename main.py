@@ -4,16 +4,16 @@ logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
 )
 
+from dotenv import load_dotenv
+load_dotenv()
+
 from os import getenv
 import time
-from dotenv import load_dotenv
 import uvicorn
 from fastapi import FastAPI
-
 from src.WeddingWA import app as WeddingWA
 
 
-load_dotenv()
 app = FastAPI()
 WeddingWA.startup()
 

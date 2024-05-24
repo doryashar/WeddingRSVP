@@ -1,6 +1,12 @@
 Wedding Inviter
 
+* docker build and run: 
+`docker build -t weddingapp:latest -f ./Dockerfile .`
+`docker run --rm -p 80:80 weddingapp:latest`
+
+
 TODO:
+- add user functions (routes) for send-invite, send-reminder
 - for every response error put logging message.
 - add errors table to put some need to review errors there. test
 - add reminded times to allow multiple reminders

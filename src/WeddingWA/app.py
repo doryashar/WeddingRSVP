@@ -3,13 +3,13 @@ import os
 from fastapi import BackgroundTasks, Request, Response, Query
 from fastapi.responses import RedirectResponse
 
-import db_interface as db
-import wa_functions as wa
-import gs_interface as gs
+from . import db_interface as db
+from . import gs_interface as gs
+from . import wa_functions as wa
+from .message_templates import templates
 
 from datetime import datetime
 from .types import *
-from message_templates import templates
 
 # =============================================================================== #
 
