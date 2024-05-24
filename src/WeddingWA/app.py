@@ -79,6 +79,7 @@ async def got_new_form_update(request: Request):
     await gs.update_row_with_form_answer(answers)
     if not await db.update_row(**answers):
         return Response(status_code=404, content="Error occured")
+    return Response(status_code=200, content="OK")
     
 async def got_new_wa_delivery(delivery_status, msg_id, phone_number, timestamp):
     bys = [("phone", phone_number), ("msgid", msg_id)]
