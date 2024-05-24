@@ -19,4 +19,6 @@ EXPOSE 80
 # configure the container to run in an executed manner
 ENTRYPOINT [ "python" ]
 
-CMD ["fastapi_serve.py"] #uvicorn fastapi_serve:api --reload
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "80", "--reload", "--workers", "4", "--worker-class", "uvicorn.workers.UvicornWorker"]
+# ["app.py"] 
+#gunicorn main:app --workers 4 --worker-class 
