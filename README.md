@@ -81,3 +81,4 @@ STATUS - last sent message delivery status: trying, failed, delivery-error, sent
 TIMESTAMP - last update timestamp
 time - created time
 history - [(timestamp, id, message, status)...]
+

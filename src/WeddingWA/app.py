@@ -60,6 +60,7 @@ def get_new_message_id(curr_state, message):
     
 def convert_form_to_row(answers):
     return {
+        'phone' : answers['Phone number'],
         'requests' : answers['הערות או בקשות'],
         'confirmed' : answers['מספר האורחים שיגיעו'] if answers['האם תגיעו לחתונה?'] == 'כן' else '0',
         'veggis' : answers['כמות צמחוניים\\טבעוניים'],
