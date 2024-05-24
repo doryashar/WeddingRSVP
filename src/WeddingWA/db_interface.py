@@ -12,7 +12,6 @@ password: str = os.environ.get("SUPABASE_PASS")
 
 supabase: Client = create_client(url, key)
 session = supabase.auth.sign_in_with_password(dict(email=username, password=password))
-#supabase.postgrest.auth(session.access_token)
 
 WEDDING_TABLE = "wedding_statuses"
 MESSAGES_TABLE = "whatsapp_messages" # For unknown phone
@@ -93,7 +92,7 @@ async def get_row(phone, wedding_id=0, uid=None, tables=[WEDDING_TABLE, MESSAGES
 #         #TODO: insert to errors table?
 #         return Response(status_code=404, content="msg not found")
     
-def get_wedding_by_id(wedding_id):
+async def get_wedding_by_id(wedding_id):
     #TODO
     return dict(
         host = "אופיר ישר וקובי ואקנין.",
