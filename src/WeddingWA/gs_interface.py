@@ -7,6 +7,8 @@ async def update_row_with_form_answer(answers):
         docname = "Family Reunion RSVP Form"
         sh = gc.open(docname)
         wks = sh.get_worksheet(1)
+        logging.info(f"Updating spreadsheet {docname} with {answers}") 
+        
         dataframe = pd.DataFrame(wks.get_all_records())
         item = dataframe[dataframe['phone'].astype(str) == answers['phone']]
         if len(item) != 1: 
@@ -14,7 +16,6 @@ async def update_row_with_form_answer(answers):
         else:
             logging.debug(f"Found item {item} for answers: {answers}") 
         
-        logging.info(f"Updating spreadsheet {docname} with {answers}") 
         loc = item.index[0]
         for a,b in answers.items():
             dataframe.loc[loc, a] = b
