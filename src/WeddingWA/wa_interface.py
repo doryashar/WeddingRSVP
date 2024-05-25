@@ -16,8 +16,6 @@ def add_delivery_handler_cb(cb):
     
 
 
-
-
 async def send_message(phone_number, message):    
     logging.info(f"Sending message: {message} to: {phone_number}")
     rsp = messenger.send_message(message, phone_number)
@@ -29,27 +27,6 @@ async def send_message(phone_number, message):
     return ret
 
 
-async def verify_wa_token(
-    token: str = Query(alias="hub.verify_token"),
-    challenge: str = Query(alias="hub.challenge"),
-    ):
-    if token == os.getenv('FLASK_VERIFY_TOKEN'):
-        logging.info("Verified webhook")
-        return challenge
-    logging.error("Webhook Verification failed")
-    return "Invalid verification token"
- 
-async def wa_in_webhook(request: Request, bg_tasks: BackgroundTasks):
-    try:
-        data = await request.json()
-        logging.info("Received webhook data: %s", data)
-        bg_tasks.add_task(wa.handle_data, data)
-        return "Success"
-    except Exception as e:
-        logging.error(f"Exception caught in webhook: {e}")
-        return Response(status_code=404, content="Not found")
-    
-    
     
 async def handle_incoming_message(message, from_mobile, from_name, id):
     logging.info("Handling Message: %s", message)
@@ -145,3 +122,22 @@ async def handle_data(data):
             else:
                 logging.info("No new message")
  
+async def verify_wa_token(
+    token: str = Query(alias="hub.verify_token"),
+    challenge: str = Query(alias="hub.challenge"),
+    ):
+    if token == os.getenv('FLASK_VERIFY_TOKEN'):
+        logging.info("Verified webhook")
+        return challenge
+    logging.error("Webhook Verification failed")
+    return Response(status_code=400, content="Invalid verification token")
+ 
+async def wa_in_webhook(request: Request, bg_tasks: BackgroundTasks):
+    try:
+        data = await request.json()
+        logging.info("Received webhook data: %s", data)
+        bg_tasks.add_task(handle_data, data)
+        return "Success"
+    except Exception as e:
+        logging.error(f"Exception caught in webhook: {e}")
+        return Response(status_code=404, content="Not found")

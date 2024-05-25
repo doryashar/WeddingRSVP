@@ -5,7 +5,7 @@ from fastapi.responses import RedirectResponse
 
 from . import db_interface as db
 from . import gs_interface as gs
-from . import wa_functions as wa
+from . import wa_interface as wa
 from .message_templates import templates
 
 from datetime import datetime
@@ -69,7 +69,6 @@ def convert_form_to_row(answers):
     
 # =============================================================================== #
 
-#TODO: attach to webhook
 async def got_new_form_update(request: Request):
     path_params = request['path_params']
     params = request.query_params
@@ -86,13 +85,15 @@ async def got_new_wa_delivery(delivery_status, msg_id, phone_number, timestamp):
     bys = [("phone", phone_number), ("msgid", msg_id)]
     table, uid, row = await db.get_row_by(bys)
     if uid is None:
-        #TODO: update in erros table
-        logging.error(f"Got delivery status {delivery_status} from unknown phone: {phone_number} with msgid: {msg_id} ({row})")
+        errmsg = f"Got delivery status {delivery_status} from unknown phone: {phone_number} with msgid: {msg_id} ({row})"
+        logging.error(errmsg)
+        db.add_error(errmsg)
         return Response(status_code=500, content="Error occured")
     logging.info(f"Got delivery status {delivery_status} from phone: {phone_number} with msgid: {msg_id}")
     if not await db.update_row(tables=table, uid=uid, timestamp=timestamp, status=delivery_status):
-        #TODO: update in erros table
-        logging.error(f"Could not update db with delivery status {delivery_status} from phone: {phone_number} with msgid: {msg_id}")
+        errmsg = f"Could not update db with delivery status {delivery_status} from phone: {phone_number} with msgid: {msg_id}"
+        logging.error(errmsg)
+        db.add_error(errmsg)
         return Response(status_code=500, content="Error occured")
     return Response(status_code=200, content="OK")
     

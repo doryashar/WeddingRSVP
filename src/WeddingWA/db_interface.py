@@ -23,6 +23,12 @@ def add_wedding(**fields):
 def archive_wedding(bys, to="archived"):
     pass
 
+def add_error(message):
+    data = supabase.table(ERRORS_TABLE).insert({"timestamp": str(datetime.now()), "message": message}).execute()
+    if len(data.data) == 0:
+        return False
+    return True
+
 def add_message(phone, message, msgid):
     data = supabase.table(MESSAGES_TABLE).insert({"phone": phone, "msgid": msgid, "timestamp": str(datetime.now()), "message": message}).execute()
     if len(data.data) == 0:
