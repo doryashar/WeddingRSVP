@@ -65,7 +65,7 @@ def connect_from_pc():
     return gc
 
 def get_list_of_invites():
-    gc = connect()
+    gc = connect_from_pc()
     # gc = gspread.(credentials)
     docname = "Family Reunion RSVP Form"
     sheetname = "OFIR"

@@ -238,9 +238,9 @@ def startup():
     wa.add_message_handler_cb(got_new_wa_message)
 
 def test():
-    # Clicking from WA RSVP works
-    # Table updates
-    # GS updates
+    # Clicking from WA RSVP works - V
+    # Table updates - V
+    # GS updates - V
     
     # Verify we can send a message and update all the statuses upto 'read'
     # Verify we can recieve a message and update the history
