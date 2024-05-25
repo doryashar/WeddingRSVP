@@ -62,7 +62,7 @@ async def handle_data(data):
             logging.info(f"New Message; sender:{mobile} name:{name} type:{message_type}")
             if message_type == "text":
                 message = messenger.get_message(data)
-                # await send_read_receipt(data)
+                await send_read_receipt(data)
                 id = messenger.get_message_id(data)
                 await handle_incoming_message(message, mobile, name, id)
                 return

@@ -13,11 +13,12 @@ from .types import *
 
 # =============================================================================== #
 
-def verify_legal_send(template_id, wedding_row, invitee_row):
+def verify_legal_send(template, wedding_row, invitee_row):
+    template_id = template.split('-')[0]
     if template_id == 'invite' and invitee_row['state'] != 'waiting' or invitee_row['status'] in ['read', 'delivered']:
-        return "Already sent invite to {}".format(**invitee_row)
+        return "Already sent invite to {}".format(invitee_row)
     elif template_id == 'reminder' and invitee_row['state'] not in ['invite']:
-        return "Cannot send reminder to {}".format(**invitee_row)
+        return f"Cannot send reminder to {invitee_row}"
     return None
     
 def get_new_state(curr_state, curr_status, message, status):
@@ -67,6 +68,13 @@ def convert_form_to_row(answers):
         'state' : 'answered',
     }
     
+def update_fields(fields, message, curr_state, curr_status):
+    if curr_state in ['invite', 'remind'] and message == NOT_ATTENDING:
+        # fields['state'] = 'answered'
+        fields['confirmed'] = '0'
+    elif curr_state in ['invite', 'remind', 'followup-guest-num'] and message.isdigit(): #message == YES_ATTENDING:
+        fields['confirmed'] = message
+                
 # =============================================================================== #
 
 async def got_new_form_update(request: Request):
@@ -110,21 +118,23 @@ async def got_new_wa_message(msgid, phone_number, status="received", message=Non
     # add to history
     fields['history'] = row['history'] + f"{(timestamp, msgid, message, status)}"
     
-    # get the new state
+    # get the new fields
     curr_state = row['state']
     curr_status = row['status']
     wedding_id = row['wedding_id']
+    update_fields(fields, message, curr_state, curr_status)
     
     # update the row
     gs.update_row(row.get('phone'), **fields)
-    res = await db.update_row(uid, **fields, tables = table)
+    logging.debug(f"Updating db uid= {uid}, tables= {table}, fields= {fields}")
+    res = await db.update_row(uid=uid, **fields, tables=table)
     if not res:
         logging.error("Error updating row with incoming wa message")
         
     # send new template
     followup_messagd_id = get_new_message_id(curr_state, message)
     if followup_messagd_id:
-        return await send_message_id(wedding_id, followup_messagd_id, phone_number)
+        return await send_message_id(wedding_id, followup_messagd_id + '-0', phone_number)
     return Response(status_code=200, content="OK")
 
 # =============================================================================== #
@@ -239,56 +249,3 @@ def startup():
     wa.add_delivery_handler_cb(got_new_wa_delivery)
     wa.add_message_handler_cb(got_new_wa_message)
 
-def test():
-    # Clicking from WA RSVP works - V
-    # Table updates - V
-    # GS updates - V
-    
-    # Verify we can send a message and update all the statuses upto 'read'
-    # Verify we can recieve a message and update the history
-    # Verify we can recieve a message from unknown and update the messages table
-    
-    # Send invite to a new invitee, try to send another one. expect error.
-    # send invite to unknown invitee. expect error.
-    # send invite to a wrong number. expect error.
-    
-    # Send reminder to an invitee.
-    # receive text, verify that the text is in the history/notes and the state is reminded.
-    # Send another reminder, expect error.
-    # receive declined, verify that the state is answered and last message is delined message.
-    # receive 0 -> TBD
-    # receive new answer, verify that the state is waiting for number.
-    # receive text, verify that the text is in the history/notes and the state is waiting for number.
-    # receive number, verify that the state is answered and last message is filled message.
-    # receive text, verify that the state is answered and last message is filled message and notes + history is updated.
-    
-    # Send reminder to an invitee.
-    # receive accepted, verify that the state is waiting for number.
-    # receive text, verify that the text is in the history/notes and the state is waiting for number.
-    # receive number, verify that the state is answered and last message is filled message.
-    # receive text, verify that the state is answered and last message is filled message and notes + history is updated.
-    
-    # Send reminder to an invitee.
-    # receive maybe, verify that the state is reminded and sent maybe.
-    # receive text, verify that the text is in the history/notes and the state is reminded.
-    # receive number, verify that the text is in the history/notes and the state is reminded.
-    # receive accepted, verify that the state is waiting for number.
-    # receive decline, verify that the state is answered and history is declined message and sent declined message.
-    # receive text, verify that the state is answered and last message is filled message and notes + history is updated.
-    # receive number -> TBD
-    
-    # RSVP route 
-    # app.add_route("/rsvp/{code}", WeddingWA.rsvp, ["GET"])
-    # -> verify getting 302
-    # -> verify update to clicked
-    # -> verify error if not exists
-    
-    # app.add_route("/get_google_cal", WeddingWA.get_google_calendar, ["GET"]) #/{code}
-    # -> verify getting 302
-    
-    # app.add_route("/", WeddingWA.wa.verify_wa_token , ["GET"])
-    # app.add_route("/", WeddingWA.wa.wa_in_webhook , ["POST"])
-    # app.add_route("/send-message-id/{wedding_id}/{message}/{phone_number}", WeddingWA.send_message_id , ["GET"])
-    # app.add_route("/send-template-id/{wedding_id}/{template_id}/{phone_number}", WeddingWA.send_template_id , ["GET"])
-    # app.add_route("/update_invitee", WeddingWA.got_new_form_update, ["POST"])
-    pass

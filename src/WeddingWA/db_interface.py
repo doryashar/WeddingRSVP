@@ -42,7 +42,7 @@ def init_user_row(phone, wedding_id=0, **fields):
     else:
         return data
     
-async def get_row_by(bys, tables=[WEDDING_TABLE, MESSAGES_TABLE]):
+async def get_row_by(bys, tables=[WEDDING_TABLE, MESSAGES_TABLE], allow_multi=False):
     if not isinstance(bys, list):
         bys = [bys]
     for table in tables:
@@ -52,24 +52,28 @@ async def get_row_by(bys, tables=[WEDDING_TABLE, MESSAGES_TABLE]):
         if len(data.data) == 1:
             return table, data.data[0]['uid'], data.data[0]
         elif len(data.data) > 1:
+            if allow_multi:
+                return table, 'multi', data.data
             return table, None, f"found more than 1 results for {bys} in {table}"
     return None, None, f"no results for {bys} in {tables}"
 
 async def update_tables_by(bys, tables=[WEDDING_TABLE, MESSAGES_TABLE], **fields):
     if not isinstance(bys, list):
         bys = [bys]
-        for table in tables:
-            try:
-                data = supabase.table(table).update({"timestamp": str(datetime.now()), **fields})
-                for by in bys:
-                    data = data.eq(*by)
-                data = data.execute()
-                logging.info(data)
-                if len(data.data):
-                    return data.data
-            except Exception as exp:
-                logging.error(f"trying to update table {table} by {bys} with fields: {fields} failed with exception: {exp}")
-                return False
+    if not isinstance(tables, list):
+        tables = [tables] 
+    for table in tables:
+        try:
+            data = supabase.table(table).update({"timestamp": str(datetime.now()), **fields})
+            for by in bys:
+                data = data.eq(*by)
+            data = data.execute()
+            if len(data.data):
+                return data.data
+        except Exception as exp:
+            logging.error(f"trying to update table {table} by {bys} with fields: {fields} failed with exception: {exp}")
+            return False
+    logging.error(f'did not find {bys} in {tables}')
     return False
     
         
