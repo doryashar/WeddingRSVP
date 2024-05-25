@@ -10,6 +10,7 @@ async def update_row_with_form_answer(answers):
 # ==================================================================
 
 def save_wks(wks, df):
+    df = df.fillna('') #To fix: Out of range float values are not JSON compliant
     wks.update([df.columns.values.tolist()] + df.values.tolist())
         
 def update_row(phone, **fields):
@@ -23,7 +24,8 @@ def update_row(phone, **fields):
         
         loc = item.index[0]
         for a,b in fields.items():
-            dataframe.loc[loc, a] = str(b) if b is not None else None
+            if b:
+                dataframe.loc[loc, a] = b 
         # dataframe.update(item)
         save_wks(wks, dataframe)
         logging.info(f"Done updating wks {wks}")
@@ -37,7 +39,7 @@ def connect_gspread():
         auser = os.getenv('GSPREAD_AUTHORIZED_USER', None)
         auser = json.loads(auser) if auser else None
         creds = json.loads(os.getenv('GSPREAD_CREDENTIALS', '{}'))
-        logging.info(f"Trygin to connect with creds: {creds}, auser: {auser}")
+        logging.info(f"Trying to connect with creds: {creds}, auser: {auser}")
         gc, authorized_user = gspread.oauth_from_dict(creds, authorized_user_info=auser)    
         logging.info(f"Authorized user is: {authorized_user}")
         return gc
