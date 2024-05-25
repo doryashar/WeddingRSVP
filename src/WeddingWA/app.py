@@ -116,7 +116,7 @@ async def got_new_wa_message(msgid, phone_number, status="received", message=Non
     wedding_id = row['wedding_id']
     
     # update the row
-    #TODO: update in gs as well
+    gs.update_row(row.get('phone'), **fields)
     res = await db.update_row(uid, **fields)
     if not res:
         logging.error("Error updating row with incoming wa message")
@@ -133,7 +133,7 @@ async def got_new_wa_message(msgid, phone_number, status="received", message=Non
 #TODO: merge send_message_id + send_template_id
 # app.add_route("/send-message-id/{wedding_id}/{message}/{phone_number}", WeddingWA.send_message , ["GET"])
 async def send_message_id(wedding_id, message_id, phone_number): 
-    #TODO: get message by id, wedding by id and create a message
+    #get message by id, wedding by id and create a message
     wedding_row = await db.get_wedding_by_id(wedding_id) 
     _,uid, invitee_row = await db.get_row(phone_number, wedding_id=wedding_id, tables=[db.WEDDING_TABLE]) 
     if uid is None:
@@ -143,15 +143,16 @@ async def send_message_id(wedding_id, message_id, phone_number):
     status = "trying" if res.status_code == 200 else "failed"
     new_state = get_new_state(invitee_row['state'], invitee_row['status'], message_id, status)
     timestamp = str(datetime.now())
-    #TODO: update in gs as well
-    invitee_row.update({
+    update_fields = {
         "history" : invitee_row['history'] + (timestamp, res.id, message_id, status),
         "msgid"   : res.id,
         "status"  : status,
         "state"   : new_state,
         "timestamp": timestamp
-    })
+    }
+    invitee_row.update(update_fields)
     await db.update_row(**invitee_row)
+    gs.update_row(**invitee_row)
     return res
 
 # app.add_route("/send-template-id/{wedding_id}/{template_id}/{phone_number}", WeddingWA.send_template , ["GET"])
@@ -177,7 +178,6 @@ async def send_template_id(wedding_id, template_id, phone_number):
         resp = Response(status_code=200, content="Success")
     new_state = get_new_state(invitee_row['state'], invitee_row['status'], template_id, status)
     timestamp = str(datetime.now())
-    #TODO: update in gs as well
     invitee_row.update({
         "history" : invitee_row['history'] + (timestamp, res.id, template_id, status),
         "msgid"   : res.id,
@@ -185,7 +185,7 @@ async def send_template_id(wedding_id, template_id, phone_number):
         "state"   : new_state,
         "timestamp": timestamp
     })
-    
+    gs.update_row(**invitee_row)
     await db.update_row(**invitee_row) # await update_tables_by(by=("uid", uid), status=state, id=res['messages'][0]['id'], phone=phone_number)
     return resp
 
@@ -206,13 +206,16 @@ async def rsvp(request: Request):
         name = row.get('name')
         status = row.get('status')
         logging.info("%s %s was %s and now clicked", phone, name, status)
+        gs.update_row(phone=phone, clicked=True)
         res = await db.update_row(wedding_id=0, uid=uid, tables=table, clicked=True) #  data = supabase.table(WEDDING_TABLE).update({"status": "clicked", "timestamp": str(time.time())}).eq("uid", uid).execute()
-        #TODO: update in gs as well
         if not res:
-            # TODO: update error table
-            logging.error(f"Error updating rsvp for code={code} uid={uid}")
+            errmsg = f"Error updating rsvp for code={code} uid={uid}"
+            db.add_error(errmsg)
+            logging.error(errmsg)
     except Exception as exp:
-        logging.error(f"Exception caught in rsvp: {exp}")
+        errmsg = f"Exception caught in rsvp: {exp}"
+        db.add_error(errmsg)
+        logging.error(errmsg)
         return Response(status_code=500, content=exp)
     return RedirectResponse(f"https://forms.fillout.com/t/xwYB5jKk1Gus?phone={phone}&name={name}", status_code=302)
 
