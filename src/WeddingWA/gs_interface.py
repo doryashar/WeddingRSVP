@@ -34,9 +34,12 @@ def update_row(phone, **fields):
 
 def connect_gspread():
         import gspread, json
-        auser = json.loads(os.getenv('GSPREAD_AUTHORIZED_USER', '{}'))
-        creads = json.loads(os.getenv('GSPREAD_CREDENTIALS', '{}'))
-        gc, authorized_user = gspread.oauth_from_dict(creads, authorized_user_info=auser)    
+        auser = os.getenv('GSPREAD_AUTHORIZED_USER', None)
+        auser = json.loads(auser) if auser else None
+        creds = json.loads(os.getenv('GSPREAD_CREDENTIALS', '{}'))
+        logging.info(f"Trygin to connect with creds: {creds}, auser: {auser}")
+        gc, authorized_user = gspread.oauth_from_dict(creds, authorized_user_info=auser)    
+        logging.info(f"Authorized user is: {authorized_user}")
         return gc
 
 gc = connect_gspread()

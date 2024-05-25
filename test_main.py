@@ -1,9 +1,16 @@
+# import logging
+# logging.basicConfig(
+#     level=logging.INFO,
+#     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+# )
+# from dotenv import load_dotenv
+# load_dotenv()
+
 from fastapi.testclient import TestClient
-from src.WeddingWA import app
+from main import app
 import random, string
 import time
 
-from src.WeddingWA import db_interface as db
 client = TestClient(app)
 
 
@@ -24,7 +31,6 @@ def test_read_item():
     - Verify we can recieve a message and update the history
     - Verify we can recieve a message from unknown and update the messages table
     """
-    
     response = client.get(f"/send-template-id/{wedding_id}/{message_id}/{phone_number}") #, headers={"X-Token": "coneofsilence"})
     assert response.status_code == 200
     # assert response.json() == {
@@ -38,7 +44,7 @@ def test_read_item():
     received_message, msgid = fake_receive_message(phone_number, message)
     response = client.post('/', json=received_message)
     assert response.status_code == 200
-    row = db.get_row(phone=phone_number)
+    row = app.db.get_row(phone=phone_number)
     history = row.get('history')
     assert msgid in history
     assert message in history

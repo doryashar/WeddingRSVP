@@ -20,7 +20,7 @@ def verify_legal_send(template_id, wedding_row, invitee_row):
         return "Cannot send reminder to {}".format(**invitee_row)
     return None
     
-def get_new_state(curr_state, message, status):
+def get_new_state(curr_state, curr_status, message, status):
     # if we sent a template:
     if status != 'received' and message in templates:
         template = message.split('-')[0]
@@ -161,12 +161,12 @@ async def send_template_id(wedding_id, template_id, phone_number):
     _,uid, invitee_row = await db.get_row(phone_number, wedding_id=wedding_id, tables=[db.WEDDING_TABLE]) 
     if uid is None:
         return Response(status_code=404, content=f"Not found {uid}")
-    template = templates.get(template_id)(**wedding_row, **invitee_row)
+    template = templates.get(template_id)(phone_number=phone_number, **wedding_row, **invitee_row)
     res = verify_legal_send(template_id, wedding_row, invitee_row)
     if res:
         #TODO: update in errors table
         return Response(status_code=400, content=f"Illegal template sending: {res}")
-    res = wa.send_template(**template)
+    res = wa.messenger.send_template(**template)
     
     if res.get('error', None) != None:
         logging.error(res)
@@ -180,7 +180,7 @@ async def send_template_id(wedding_id, template_id, phone_number):
     timestamp = str(datetime.now())
     invitee_row.update({
         "history" : invitee_row['history'] + (timestamp, res.id, template_id, status),
-        "msgid"   : res.id,
+        "msgid"   : res['id'],
         "status"  : status,
         "state"   : new_state,
         "timestamp": timestamp

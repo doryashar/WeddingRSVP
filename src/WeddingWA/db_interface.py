@@ -50,7 +50,7 @@ async def get_row_by(bys, tables=[WEDDING_TABLE, MESSAGES_TABLE]):
         for by in bys: data = data.eq(*by)
         data = data.execute()
         if len(data.data) == 1:
-            return table, data.data['uid'], data.data
+            return table, data.data[0]['uid'], data.data[0]
         elif len(data.data) > 1:
             return table, None, f"found more than 1 results for {bys} in {table}"
     return None, None, f"no results for {bys} in {tables}"
