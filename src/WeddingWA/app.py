@@ -108,7 +108,7 @@ async def got_new_wa_message(msgid, phone_number, status="received", message=Non
         
     fields = dict()
     # add to history
-    fields['history'] = row['history'] + (timestamp, msgid, message, status)
+    fields['history'] = row['history'] + f"{(timestamp, msgid, message, status)}"
     
     # get the new state
     curr_state = row['state']
@@ -117,7 +117,7 @@ async def got_new_wa_message(msgid, phone_number, status="received", message=Non
     
     # update the row
     gs.update_row(row.get('phone'), **fields)
-    res = await db.update_row(uid, **fields)
+    res = await db.update_row(uid, **fields, tables = table)
     if not res:
         logging.error("Error updating row with incoming wa message")
         
@@ -140,11 +140,12 @@ async def send_message_id(wedding_id, message_id, phone_number):
         return Response(status_code=404, content=f"Not found {uid}")
     message = templates.get(message_id, message_id).format(**wedding_row, **invitee_row)
     res = await wa.send_message(phone_number, message)
-    status = "trying" if res.status_code == 200 else "failed"
+    status = "accepted" if res.status_code == 200 else "failed" #TODO: res['messages'][0]['message_status']?
     new_state = get_new_state(invitee_row['state'], invitee_row['status'], message_id, status)
     timestamp = str(datetime.now())
+    msgid = res.id
     update_fields = {
-        "history" : invitee_row['history'] + (timestamp, res.id, message_id, status),
+        "history" : invitee_row['history'] + f"{(timestamp, msgid, message_id, status)}",
         "msgid"   : res.id,
         "status"  : status,
         "state"   : new_state,
@@ -174,13 +175,14 @@ async def send_template_id(wedding_id, template_id, phone_number):
         resp = Response(status_code=400, content="Error when trying to send the invite")
     else:
         logging.info(res)
-        status = "trying"
+        status = res['messages'][0]['message_status']
         resp = Response(status_code=200, content="Success")
     new_state = get_new_state(invitee_row['state'], invitee_row['status'], template_id, status)
     timestamp = str(datetime.now())
+    msgid = res['messages'][0]['id']
     invitee_row.update({
-        "history" : invitee_row['history'] + (timestamp, res.id, template_id, status),
-        "msgid"   : res['id'],
+        "history" : invitee_row['history'] + f"{(timestamp, msgid, template_id, status)}",
+        "msgid"   : msgid,
         "status"  : status,
         "state"   : new_state,
         "timestamp": timestamp

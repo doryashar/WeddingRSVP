@@ -15,7 +15,7 @@ def save_wks(wks, df):
 def update_row(phone, **fields):
     try:
         dataframe = pd.DataFrame(wks.get_all_records())
-        item = dataframe[dataframe['phone'].astype(str) == phone]
+        item = dataframe[dataframe['phone'].astype(str) == str(phone)]
         if len(item) != 1: 
             raise Exception(f"phone: {phone} was found {len(item)} times")
         else:
@@ -23,7 +23,7 @@ def update_row(phone, **fields):
         
         loc = item.index[0]
         for a,b in fields.items():
-            dataframe.loc[loc, a] = b
+            dataframe.loc[loc, a] = str(b) if b is not None else None
         # dataframe.update(item)
         save_wks(wks, dataframe)
         logging.info(f"Done updating wks {wks}")

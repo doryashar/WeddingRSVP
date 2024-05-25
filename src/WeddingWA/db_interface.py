@@ -58,14 +58,18 @@ async def get_row_by(bys, tables=[WEDDING_TABLE, MESSAGES_TABLE]):
 async def update_tables_by(bys, tables=[WEDDING_TABLE, MESSAGES_TABLE], **fields):
     if not isinstance(bys, list):
         bys = [bys]
-    for table in tables:
-        data = supabase.table(table).update({"timestamp": str(datetime.now()), **fields})
-        for by in bys:
-            data = data.eq(*by)
-        data = data.execute()
-        logging.info(data)
-        if len(data.data):
-            return data.data
+        for table in tables:
+            try:
+                data = supabase.table(table).update({"timestamp": str(datetime.now()), **fields})
+                for by in bys:
+                    data = data.eq(*by)
+                data = data.execute()
+                logging.info(data)
+                if len(data.data):
+                    return data.data
+            except Exception as exp:
+                logging.error(f"trying to update table {table} by {bys} with fields: {fields} failed with exception: {exp}")
+                return False
     return False
     
         

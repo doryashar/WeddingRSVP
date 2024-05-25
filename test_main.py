@@ -5,12 +5,12 @@
 # )
 # from dotenv import load_dotenv
 # load_dotenv()
-
+import pytest
 from fastapi.testclient import TestClient
 from main import app
+from main import WeddingWA
 import random, string
-import time
-
+from time import time
 client = TestClient(app)
 
 
@@ -21,11 +21,12 @@ phone_number = '972548826569'
 def fake_receive_message(phone, message):
     id = str(random.randint(1000000000,9999999999))
     msgid = ''.join([random.choice(string.ascii_letters) for i in range(20)])
-    timestamp = time.now()
+    timestamp = time()
     received_message = {'object': 'whatsapp_business_account', 'entry': [{'id': str(id), 'changes': [{'value': {'messaging_product': 'whatsapp', 'metadata': {'display_phone_number': '972559569965', 'phone_number_id': '101369269635426'}, 'contacts': [{'profile': {'name': 'Dor'}, 'wa_id': phone}], 'messages': [{'from': phone, 'id': msgid, 'timestamp': timestamp, 'text': {'body': message}, 'type': 'text'}]}, 'field': 'messages'}]}]}
     return received_message, msgid
 
-def test_read_item():
+@pytest.mark.asyncio
+async def test_read_item():
     """ 
     - Verify we can send a message and update all the statuses upto 'read'
     - Verify we can recieve a message and update the history
@@ -44,8 +45,10 @@ def test_read_item():
     received_message, msgid = fake_receive_message(phone_number, message)
     response = client.post('/', json=received_message)
     assert response.status_code == 200
-    row = app.db.get_row(phone=phone_number)
+    table, uid, row = await WeddingWA.db.get_row(phone=phone_number)
     history = row.get('history')
+    assert message == row.get('message')
+    assert msgid == row.get('msgid')
     assert msgid in history
     assert message in history
     

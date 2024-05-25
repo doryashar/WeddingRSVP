@@ -60,3 +60,4 @@ googletrans==2.4.0
 pandas
 gspread==6.1.0
 pytest
+pytest-asyncio
