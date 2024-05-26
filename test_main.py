@@ -21,12 +21,13 @@ class AttrDict(dict):
         
 async def fake_send_read_receipt(data):
     return True
-def fake_send_message(message,phone_number):
-    item = AttrDict(status_code=200, messages = [{'id': 'TEST'}])
+def fake_send_message(message ,phone_number):
+    item = AttrDict(status_code=200, messages = [{'id': 'TEST', 'message_status' : 'accepted'}])
     logging.error(f"Sending {message} to {phone_number}")
     return item
 WeddingWA.wa.send_read_receipt = fake_send_read_receipt
 WeddingWA.wa.messenger.send_message = fake_send_message
+WeddingWA.wa.messenger.send_template = lambda template, recipient_id, *args, **kwargs: fake_send_message(template, recipient_id)
 
 wedding_id = 0
 phone_number = '972548826569'
@@ -100,7 +101,7 @@ async def test_reminder_flows():
     template_id = 'reminder-0'
     
     # first, reset the user state and history to invite:
-    res = await WeddingWA.db.update_row(phone=phone_number, state='invite', history='',tables=[WeddingWA.db.WEDDING_TABLE])
+    res = await WeddingWA.db.update_row(phone=phone_number, state='invite', notes='', history='',tables=[WeddingWA.db.WEDDING_TABLE])
     assert res is True
     
     # Send reminder to an invitee.
@@ -120,18 +121,57 @@ async def test_reminder_flows():
     assert response.status_code != 200
     
     # receive declined, verify that the state is answered and last message is delined message.
-    received_message, msgid = fake_receive_message(phone_number, "לצערי לא אגיע")
+    received_message, msgid = fake_receive_message(phone_number, WeddingWA.NOT_ATTENDING)
     response = client.post('/', json=received_message)
     table, uid, row = await WeddingWA.db.get_row(phone=phone_number)
     assert row['state'] == 'answered'
-    assert "לצערי לא אגיע" in row['history']
+    assert WeddingWA.NOT_ATTENDING in row['history'] #TODO: maybe the last message in history?
     assert row['confirmed'] == '0'
     
-    # receive 0 -> TBD
+    # receive 0 -> not changing (TODO: verify not changing if same value entered / message "updated")
+    received_message, msgid = fake_receive_message(phone_number, WeddingWA.NOT_ATTENDING)
+    response = client.post('/', json=received_message)
+    table, uid, row = await WeddingWA.db.get_row(phone=phone_number)
+    assert row['state'] == 'answered'
+    assert "0" in row['history'] #TODO: maybe the last message in history?
+    assert row['confirmed'] == '0'
+    
     # receive new answer, verify that the state is waiting for number.
+    received_message, msgid = fake_receive_message(phone_number, WeddingWA.YES_ATTENDING)
+    response = client.post('/', json=received_message)
+    table, uid, row = await WeddingWA.db.get_row(phone=phone_number)
+    assert row['state'] == 'followup-guest-num'
+    assert WeddingWA.YES_ATTENDING in row['history'] #TODO: maybe the last message in history?
+    assert row['confirmed'] == '' #TODO:
+    
     # receive text, verify that the text is in the history/notes and the state is waiting for number.
+    message = "BALBLA"
+    received_message, msgid = fake_receive_message(phone_number, message)
+    response = client.post('/', json=received_message)
+    table, uid, row = await WeddingWA.db.get_row(phone=phone_number)
+    assert row['state'] == 'followup-guest-num'
+    assert message in row['history']
+    assert message in row['notes']
+    assert row['confirmed'] == ''
+    
     # receive number, verify that the state is answered and last message is filled message.
+    message = "4"
+    received_message, msgid = fake_receive_message(phone_number, message)
+    response = client.post('/', json=received_message)
+    table, uid, row = await WeddingWA.db.get_row(phone=phone_number)
+    assert row['state'] == 'answered'
+    assert message in row['history']
+    assert row['confirmed'] == message
+    
     # receive text, verify that the state is answered and last message is filled message and notes + history is updated.
+    text = "BALBLA"
+    received_message, msgid = fake_receive_message(phone_number, text)
+    response = client.post('/', json=received_message)
+    table, uid, row = await WeddingWA.db.get_row(phone=phone_number)
+    assert row['state'] == 'answered'
+    assert text in row['history']
+    assert text in row['notes']
+    assert row['confirmed'] == message
     
     # Send reminder to an invitee.
     # receive accepted, verify that the state is waiting for number.

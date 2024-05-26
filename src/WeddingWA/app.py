@@ -21,8 +21,9 @@ def verify_legal_send(template, wedding_row, invitee_row):
         return f"Cannot send reminder to {invitee_row}"
     return None
     
-def get_new_state(curr_state, curr_status, message, status):
+def get_new_state(curr_row, message, status):
     # if we sent a template:
+    curr_state, curr_status = curr_row['state'], curr_row['status']
     if status != 'received' and message in templates:
         template = message.split('-')[0]
         # state_from_sent_template_id
@@ -42,21 +43,23 @@ def get_new_state(curr_state, curr_status, message, status):
             return res
     return curr_state
     
-def get_new_message_id(curr_state, message):
-    if curr_state=='remind':
-        if message == YES_ATTENDING:
-            return 'accepted'
-        elif message == NOT_ATTENDING:
-            return 'declined'
-        elif message == MAYBE_ATTENDING:
-            return 'maybe'
-        else:
-            return None
+def get_new_message_id(row, message):
+    curr_state = row['state']
+    # if curr_state=='remind':
+    if message == YES_ATTENDING:
+        return 'accepted'
+    elif message == NOT_ATTENDING and not (row['state'] == 'answered' and row['confirmed'] == '0'):
+        return 'declined'
+    elif message == MAYBE_ATTENDING:
+        return 'maybe'
+    # else:
+    #     return None
+        
     # else if message is digits:
     elif curr_state=='followup-guest-num' and message.isdigit():
-        return 'followup-answered'
-    elif curr_state=='followup-answered':
-        return 'answered'
+        return 'filled'
+    # elif curr_state=='followup-answered':
+    #     return 'filled'
     return None
     
 def convert_form_to_row(answers):
@@ -68,12 +71,19 @@ def convert_form_to_row(answers):
         'state' : 'answered',
     }
     
-def update_fields(fields, message, curr_state, curr_status):
-    if curr_state in ['invite', 'remind'] and message == NOT_ATTENDING:
+def update_fields(fields, message, curr_row): 
+    # For incoming messages
+    if  message == NOT_ATTENDING: #curr_state in ['invite', 'remind'] and
         # fields['state'] = 'answered'
         fields['confirmed'] = '0'
-    elif curr_state in ['invite', 'remind', 'followup-guest-num'] and message.isdigit(): #message == YES_ATTENDING:
+    elif  message == YES_ATTENDING and curr_row['confirmed'] == '0':
+        fields['confirmed'] = ''
+    elif curr_row['state'] in ['invite', 'remind', 'followup-guest-num', 'answered'] and message.isdigit(): #message == YES_ATTENDING:
         fields['confirmed'] = message
+    
+    if curr_row['state'] in ['invite', 'remind', 'followup-guest-num', 'answered'] and not message.isdigit():
+        fields['notes'] = curr_row['notes'] if curr_row['notes'] else ''
+        fields['notes'] += '\n' + message
                 
 # =============================================================================== #
 
@@ -122,7 +132,7 @@ async def got_new_wa_message(msgid, phone_number, status="received", message=Non
     curr_state = row['state']
     curr_status = row['status']
     wedding_id = row['wedding_id']
-    update_fields(fields, message, curr_state, curr_status)
+    update_fields(fields, message, row)
     
     # update the row
     gs.update_row(row.get('phone'), **fields)
@@ -132,7 +142,7 @@ async def got_new_wa_message(msgid, phone_number, status="received", message=Non
         logging.error("Error updating row with incoming wa message")
         
     # send new template
-    followup_messagd_id = get_new_message_id(curr_state, message)
+    followup_messagd_id = get_new_message_id(row, message)
     if followup_messagd_id:
         return await send_message_id(wedding_id, followup_messagd_id + '-0', phone_number)
     return Response(status_code=200, content="OK")
@@ -151,7 +161,7 @@ async def send_message_id(wedding_id, message_id, phone_number):
     message = templates.get(message_id, message_id).format(**wedding_row, **invitee_row)
     res = await wa.send_message(phone_number, message)
     status = "accepted" if res.status_code == 200 else "failed" #TODO: res['messages'][0]['message_status']?
-    new_state = get_new_state(invitee_row['state'], invitee_row['status'], message_id, status)
+    new_state = get_new_state(invitee_row, message_id, status)
     timestamp = str(datetime.now())
     msgid = res.id
     update_fields = {
@@ -187,7 +197,7 @@ async def send_template_id(wedding_id, template_id, phone_number):
         logging.info(res)
         status = res['messages'][0]['message_status']
         resp = Response(status_code=200, content="Success")
-    new_state = get_new_state(invitee_row['state'], invitee_row['status'], template_id, status)
+    new_state = get_new_state(invitee_row, template_id, status)
     timestamp = str(datetime.now())
     msgid = res['messages'][0]['id']
     invitee_row.update({
@@ -249,3 +259,12 @@ def startup():
     wa.add_delivery_handler_cb(got_new_wa_delivery)
     wa.add_message_handler_cb(got_new_wa_message)
 
+# try:
+#     pass
+
+# except KeyboardInterrupt:
+#     import traceback, sys
+#     print(traceback.format_exc())
+#     print(sys.exc_info()[2])
+#     print("Clean exit....")
+#     sys.exit(0)
