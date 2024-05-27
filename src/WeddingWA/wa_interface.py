@@ -126,9 +126,9 @@ async def verify_wa_token(
     token: str = Query(alias="hub.verify_token"),
     challenge: str = Query(alias="hub.challenge"),
     ):
-    if token == os.getenv('FLASK_VERIFY_TOKEN'):
+    if token == os.getenv('WHATSAPP_VERIFY_TOKEN'):
         logging.info("Verified webhook")
-        return challenge
+        return Response(status_code=200, content=challenge)
     logging.error("Webhook Verification failed")
     return Response(status_code=400, content="Invalid verification token")
  

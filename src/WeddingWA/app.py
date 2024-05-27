@@ -81,9 +81,8 @@ def update_fields(fields, message, curr_row):
     elif curr_row['state'] in ['invite', 'remind', 'followup-guest-num', 'answered'] and message.isdigit(): #message == YES_ATTENDING:
         fields['confirmed'] = message
     
-    if curr_row['state'] in ['invite', 'remind', 'followup-guest-num', 'answered'] and not message.isdigit():
-        fields['notes'] = curr_row['notes'] if curr_row['notes'] else ''
-        fields['notes'] += '\n' + message
+    if curr_row['state'] in ['invite', 'remind', 'followup-guest-num', 'answered'] and not message.isdigit() and message not in [YES_ATTENDING, NOT_ATTENDING, MAYBE_ATTENDING]:
+        fields['requests'] = curr_row['requests'] + '\n' + message if curr_row['requests'] else message
                 
 # =============================================================================== #
 
@@ -167,6 +166,7 @@ async def send_message_id(wedding_id, message_id, phone_number):
     update_fields = {
         "history" : invitee_row['history'] + f"{(timestamp, msgid, message_id, status)}",
         "msgid"   : res.id,
+        "message" : message_id,
         "status"  : status,
         "state"   : new_state,
         "timestamp": timestamp
@@ -203,6 +203,7 @@ async def send_template_id(wedding_id, template_id, phone_number):
     invitee_row.update({
         "history" : invitee_row['history'] + f"{(timestamp, msgid, template_id, status)}",
         "msgid"   : msgid,
+        "message" : template_id,
         "status"  : status,
         "state"   : new_state,
         "timestamp": timestamp

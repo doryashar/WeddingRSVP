@@ -30,7 +30,6 @@ WeddingWA.wa.messenger.send_message = fake_send_message
 WeddingWA.wa.messenger.send_template = lambda template, recipient_id, *args, **kwargs: fake_send_message(template, recipient_id)
 
 wedding_id = 0
-phone_number = '972548826569'
 
 def fake_receive_message(phone, message):
     id = str(random.randint(1000000000,9999999999))
@@ -64,6 +63,7 @@ async def test_receive_message(message=None):
     """
     - Verify we can recieve a message and update the history
     """
+    phone_number = '972548826569'
     if message is None:
         message = ''.join([random.choice(string.ascii_letters) for i in range(10)])
     received_message, msgid = fake_receive_message(phone_number, message)
@@ -99,9 +99,10 @@ async def test_receive_unknown_message():
 @pytest.mark.asyncio
 async def test_reminder_flows():
     template_id = 'reminder-0'
+    phone_number = '972548826569'
     
     # first, reset the user state and history to invite:
-    res = await WeddingWA.db.update_row(phone=phone_number, state='invite', notes='', history='',tables=[WeddingWA.db.WEDDING_TABLE])
+    res = await WeddingWA.db.update_row(phone=phone_number, state='invite', requests='', history='',tables=[WeddingWA.db.WEDDING_TABLE])
     assert res is True
     
     # Send reminder to an invitee.
@@ -109,12 +110,11 @@ async def test_reminder_flows():
     assert response.status_code == 200
     # await test_send_template(template_id='reminder-0')
 
-    # receive text, verify that the text is in the history/notes and the state is reminded.
+    # receive text, verify that the text is in the history/requests and the state is reminded.
     received_message, msgid = await test_receive_message()
     table, uid, row = await WeddingWA.db.get_row(phone=phone_number)
-    #TODO: assert received_message in row['notes']
+    #TODO: assert received_message in row['requests']
     assert row['state'] == 'remind'
-    
     
     # Send another reminder, expect error.
     response = client.get(f"/send-template-id/{wedding_id}/{template_id}/{phone_number}") #, headers={"X-Token": "coneofsilence"})
@@ -142,16 +142,16 @@ async def test_reminder_flows():
     table, uid, row = await WeddingWA.db.get_row(phone=phone_number)
     assert row['state'] == 'followup-guest-num'
     assert WeddingWA.YES_ATTENDING in row['history'] #TODO: maybe the last message in history?
-    assert row['confirmed'] == '' #TODO:
+    assert row['confirmed'] == '' 
     
-    # receive text, verify that the text is in the history/notes and the state is waiting for number.
+    # receive text, verify that the text is in the history/requests and the state is waiting for number.
     message = "BALBLA"
     received_message, msgid = fake_receive_message(phone_number, message)
     response = client.post('/', json=received_message)
     table, uid, row = await WeddingWA.db.get_row(phone=phone_number)
     assert row['state'] == 'followup-guest-num'
     assert message in row['history']
-    assert message in row['notes']
+    assert message in row['requests']
     assert row['confirmed'] == ''
     
     # receive number, verify that the state is answered and last message is filled message.
@@ -163,30 +163,127 @@ async def test_reminder_flows():
     assert message in row['history']
     assert row['confirmed'] == message
     
-    # receive text, verify that the state is answered and last message is filled message and notes + history is updated.
+    # receive text, verify that the state is answered and last message is filled message and requests + history is updated.
     text = "BALBLA"
     received_message, msgid = fake_receive_message(phone_number, text)
     response = client.post('/', json=received_message)
     table, uid, row = await WeddingWA.db.get_row(phone=phone_number)
     assert row['state'] == 'answered'
     assert text in row['history']
-    assert text in row['notes']
+    assert text in row['requests']
     assert row['confirmed'] == message
     
-    # Send reminder to an invitee.
-    # receive accepted, verify that the state is waiting for number.
-    # receive text, verify that the text is in the history/notes and the state is waiting for number.
-    # receive number, verify that the state is answered and last message is filled message.
-    # receive text, verify that the state is answered and last message is filled message and notes + history is updated.
+@pytest.mark.asyncio
+async def test_reminder_flows_1():
+    template_id = 'reminder-0'
+    phone_number = '972548826568'
+    #Add the row:
+    res = WeddingWA.db.init_user_row(phone=phone_number, state='invite')
+    assert len(res.data) == 1
+    
+    # first, reset the user state and history to invite:
+    res = await WeddingWA.db.update_row(phone=phone_number, confirmed='', state='invite', requests='', history='',tables=[WeddingWA.db.WEDDING_TABLE])
+    assert res is True
     
     # Send reminder to an invitee.
+    response = client.get(f"/send-template-id/{wedding_id}/{template_id}/{phone_number}") #, headers={"X-Token": "coneofsilence"})
+    assert response.status_code == 200
+    
+    # receive accepted, verify that the state is waiting for number.
+    received_message, msgid = fake_receive_message(phone_number, WeddingWA.YES_ATTENDING)
+    response = client.post('/', json=received_message)
+    table, uid, row = await WeddingWA.db.get_row(phone=phone_number)
+    assert row['state'] == 'followup-guest-num'
+    assert WeddingWA.YES_ATTENDING in row['history']
+    assert row['confirmed'] in ['', None] 
+    
+    # receive text, verify that the text is in the history/requests and the state is waiting for number.
+    message_1 = "RANDOM" + ''.join([random.choice(string.ascii_letters) for i in range(10)])
+    received_message, msgid = fake_receive_message(phone_number, message_1)
+    response = client.post('/', json=received_message)
+    table, uid, row = await WeddingWA.db.get_row(phone=phone_number)
+    assert row['state'] == 'followup-guest-num'
+    assert message_1 in row['history']
+    assert message_1 in row['requests']
+    assert row['confirmed'] in ['', None] 
+    
+    # receive number, verify that the state is answered and last message is filled message.
+    conf = str(random.randint(0,10))
+    received_message, msgid = fake_receive_message(phone_number, conf)
+    response = client.post('/', json=received_message)
+    table, uid, row = await WeddingWA.db.get_row(phone=phone_number)
+    assert row['state'] == 'answered'
+    assert conf in row['history']
+    assert conf not in row['requests'].split('\n')[-1]
+    assert row['confirmed'] == conf
+    
+    # receive text, verify that the state is answered and last message is filled message and requests + history is updated.
+    message_2 = "RANDOM" + ''.join([random.choice(string.ascii_letters) for i in range(10)])
+    received_message, msgid = fake_receive_message(phone_number, message_2)
+    response = client.post('/', json=received_message)
+    table, uid, row = await WeddingWA.db.get_row(phone=phone_number)
+    assert row['state'] == 'answered'
+    assert message_2 in row['history'] and message_1 in row['history']
+    assert message_2 in row['requests'] and message_1 in row['requests']
+    assert row['confirmed'] == conf
+    
+    #delete the row
+    res = WeddingWA.db.del_user_row(phone=phone_number)
+    assert len(res.data)
+    
+@pytest.mark.asyncio
+async def test_reminder_flows_2():
+    template_id = 'reminder-0'
+    phone_number = '972548826567'
+    
+    res = WeddingWA.db.init_user_row(phone=phone_number, state='invite')
+    assert len(res.data) == 1
+    
+    # first, reset the user state and history to invite:
+    res = await WeddingWA.db.update_row(phone=phone_number, state='invite', requests='', history='',tables=[WeddingWA.db.WEDDING_TABLE])
+    assert res is True
+    
+    # Send reminder to an invitee.
+    response = client.get(f"/send-template-id/{wedding_id}/{template_id}/{phone_number}") #, headers={"X-Token": "coneofsilence"})
+    assert response.status_code == 200
+    
     # receive maybe, verify that the state is reminded and sent maybe.
-    # receive text, verify that the text is in the history/notes and the state is reminded.
-    # receive number, verify that the text is in the history/notes and the state is reminded.
+    received_message, msgid = fake_receive_message(phone_number, WeddingWA.MAYBE_ATTENDING)
+    response = client.post('/', json=received_message)
+    table, uid, row = await WeddingWA.db.get_row(phone=phone_number)
+    assert row['state'] == 'remind'
+    assert WeddingWA.MAYBE_ATTENDING in row['history']
+    assert 'אוקיי, כשתדעו פשוט תכתוב את המספר האנשים שיגיעו או 0 אם לא תגיעו. בכל מקרה נשמח לתשובה בהקדם!' in row['history']
+    assert row['message'] == 'maybe-0'
+    assert row['confirmed'] in ['', None] 
+    
+    # receive text, verify that the text is in the history/requests and the state is reminded.
+    message_2 = "RANDOM" + ''.join([random.choice(string.ascii_letters) for i in range(10)])
+    received_message, msgid = fake_receive_message(phone_number, message_2)
+    response = client.post('/', json=received_message)
+    table, uid, row = await WeddingWA.db.get_row(phone=phone_number)
+    assert row['state'] == 'remind'
+    assert message_2 in row['history'] and WeddingWA.MAYBE_ATTENDING in row['history']
+    assert message_2 in row['requests']
+    
+    # receive number, verify that the text is in the history/requests and the state is answered.
+    conf = str(random.randint(0,10))
+    received_message, msgid = fake_receive_message(phone_number, conf)
+    response = client.post('/', json=received_message)
+    table, uid, row = await WeddingWA.db.get_row(phone=phone_number)
+    assert row['state'] == 'answered'
+    assert conf in row['history']
+    assert conf not in row['requests'].split('\n')[-1]
+    assert row['confirmed'] == conf
+    
     # receive accepted, verify that the state is waiting for number.
     # receive decline, verify that the state is answered and history is declined message and sent declined message.
-    # receive text, verify that the state is answered and last message is filled message and notes + history is updated.
+    # receive text, verify that the state is answered and last message is filled message and requests + history is updated.
     # receive number -> TBD
+    
+    #delete the row
+    res = WeddingWA.db.del_user_row(phone=phone_number)
+    assert len(res.data)
     
 def test():
     # Clicking from WA RSVP works - V

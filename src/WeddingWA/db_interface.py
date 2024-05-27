@@ -36,11 +36,19 @@ def add_message(phone, message, msgid):
     return True
 
 def init_user_row(phone, wedding_id=0, **fields):
+    logging.error(f"init_user_row: {phone}, {wedding_id}, {fields}")
     data = supabase.table(WEDDING_TABLE).select("*").eq("phone", phone).eq("wedding_id", wedding_id).execute()
     if len(data.data) == 0:
         return supabase.table(WEDDING_TABLE).insert({"phone": phone, "wedding_id": wedding_id, "state": "waiting", "timestamp": str(datetime.now()), **fields}).execute()
     else:
         return data
+    
+def del_user_row(phone, wedding_id=0, **fields):
+    # data = supabase.table(WEDDING_TABLE).select("*").eq("phone", phone).eq("wedding_id", wedding_id).execute()
+    # if len(data.data) == 0:
+    #     return True
+    # else:
+        return supabase.table(WEDDING_TABLE).delete().eq("phone", phone).eq("wedding_id", wedding_id).execute()
     
 async def get_row_by(bys, tables=[WEDDING_TABLE, MESSAGES_TABLE], allow_multi=False):
     if not isinstance(bys, list):
