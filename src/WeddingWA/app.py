@@ -19,7 +19,7 @@ from .common_types import *
 
 def verify_legal_send(template, wedding_row, invitee_row):
     template_id = template.split('-')[0]
-    if template_id == 'invite' and invitee_row['state'] != 'waiting' or invitee_row['status'] in ['read', 'delivered']:
+    if (template_id == 'invite' and invitee_row['state'] != 'waiting') or invitee_row['status'] in ['read', 'delivered']:
         return "Already sent invite to {}".format(invitee_row)
     elif template_id == 'reminder': 
         if invitee_row['state'] not in ['invite']:
