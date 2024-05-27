@@ -30,6 +30,22 @@ def send_invite(phone_number, name):
         logging.error(f"Failed to send invite to {name} {phone_number}: \n{e}")
         return 0
     
+def send_reminder(phone_number):
+    if phone_number == None:
+        logging.error(f"Invalid invite: {phone_number}")
+        return 0
+    try:
+        res = requests.get(f"https://wedding.yashar.us/send-template-id/0/reminder-0/{phone_number}")
+        if res.status_code == 200:
+            logging.info(f"Sent invite to {phone_number}")
+            return 1
+        else:
+            logging.error(f"Failed to send invite to {phone_number}: \n{res.status_code} => {res.text}")
+            return 0
+    except Exception as e:
+        logging.error(f"Failed to send invite to {phone_number}: \n{e}")
+        return 0
+    
 def send_invitations(list_of_invites, limit):
     k = 0
     for i, row in list_of_invites[:limit].iterrows():
@@ -110,10 +126,11 @@ def filter_df(df, priority=1, status='None'):
 # =================================
 
 
-def main():
-    limit = 10
-    run_priority = None
+def invite_users(
+    limit = 10,
+    run_priority = None,
     run_status = 'None'
+    ):
     df, wks = get_list_of_invites()
     new_df = clean_df(df)
     new_df = filter_df(df, run_priority, run_status)
@@ -125,6 +142,9 @@ def main():
         # save_wks(wks, df)
     else:
         logging.error("Sent no invites")
+
+def main():
+    send_reminder('972548826569')
 
 if __name__ == '__main__':
     main()

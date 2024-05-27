@@ -9,16 +9,23 @@ from . import wa_interface as wa
 from .message_templates import templates
 
 from datetime import datetime
-from .types import *
+from .common_types import *
 
+# from pyngrok import ngrok as ng
+# HTTP_SERVER_PORT = 80
+# public_url = ng.connect(HTTP_SERVER_PORT, bind_tls=True).public_url
+# logging.info(f"Listening for connections on port {HTTP_SERVER_PORT} URL: {public_url}")
 # =============================================================================== #
 
 def verify_legal_send(template, wedding_row, invitee_row):
     template_id = template.split('-')[0]
     if template_id == 'invite' and invitee_row['state'] != 'waiting' or invitee_row['status'] in ['read', 'delivered']:
         return "Already sent invite to {}".format(invitee_row)
-    elif template_id == 'reminder' and invitee_row['state'] not in ['invite']:
-        return f"Cannot send reminder to {invitee_row}"
+    elif template_id == 'reminder': 
+        if invitee_row['state'] not in ['invite']:
+            return f"Cannot send reminder to {invitee_row}"
+        elif invitee_row['confirmed'].isdigit() and invitee_row['confirmed'] != '0':
+            return f"Cannot send reminder to {invitee_row}"
     return None
     
 def get_new_state(curr_row, message, status):
@@ -186,7 +193,7 @@ async def send_template_id(wedding_id, template_id, phone_number):
     res = verify_legal_send(template_id, wedding_row, invitee_row)
     if res:
         #TODO: update in errors table
-        return Response(status_code=400, content=f"Illegal template sending: {res}")
+        return Response(status_code=400, content=f"Illegal condition for template sending: {res}")
     res = wa.messenger.send_template(**template)
     
     if res.get('error', None) != None:
