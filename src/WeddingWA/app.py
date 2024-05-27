@@ -65,7 +65,7 @@ def get_new_message_id(row, message):
     #     return None
         
     # else if message is digits:
-    elif curr_state=='followup-guest-num' and message.isdigit():
+    elif curr_state in ['followup-guest-num', 'invite', 'remind'] and message.isdigit():
         return 'filled'
     # elif curr_state=='followup-answered':
     #     return 'filled'
@@ -151,6 +151,7 @@ async def got_new_wa_message(msgid, phone_number, status="received", message=Non
         
     # send new template
     followup_messagd_id = get_new_message_id(row, message)
+    logging.info(f"Sending followup_messagd_id: {followup_messagd_id}")
     if followup_messagd_id:
         return await send_message_id(wedding_id, followup_messagd_id + '-0', phone_number)
     return Response(status_code=200, content="OK")
