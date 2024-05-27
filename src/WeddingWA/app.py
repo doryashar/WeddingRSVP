@@ -22,9 +22,11 @@ def verify_legal_send(template, wedding_row, invitee_row):
     if template_id == 'invite' and invitee_row['state'] != 'waiting' and invitee_row['status'] in ['read', 'delivered']:
         return "Already sent invite to {}".format(invitee_row)
     elif template_id == 'reminder': 
-        if invitee_row['state'] not in ['invite']:
+        if invitee_row['confirmed'].isdigit() and invitee_row['confirmed'] != '0':
             return f"Cannot send reminder to {invitee_row}"
-        elif invitee_row['confirmed'].isdigit() and invitee_row['confirmed'] != '0':
+        elif invitee_row['state'] == 'remind' and invitee_row['status'] not in ['read', 'delivered']:
+            pass
+        elif invitee_row['state'] not in ['invite']:
             return f"Cannot send reminder to {invitee_row}"
     return None
     
@@ -199,14 +201,15 @@ async def send_template_id(wedding_id, template_id, phone_number):
     if res.get('error', None) != None:
         logging.error(res)
         status = "error"
+        msgid = res['error']
         resp = Response(status_code=400, content="Error when trying to send the invite")
     else:
         logging.info(res)
         status = res['messages'][0]['message_status']
+        msgid = res['messages'][0]['id']
         resp = Response(status_code=200, content="Success")
     new_state = get_new_state(invitee_row, template_id, status)
     timestamp = str(datetime.now())
-    msgid = res['messages'][0]['id']
     invitee_row.update({
         "history" : invitee_row['history'] + f"{(timestamp, msgid, template_id, status)}",
         "msgid"   : msgid,
