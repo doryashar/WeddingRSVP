@@ -1,7 +1,7 @@
 from typing import List
 
 
-YES_ATTENDING= "!כן, אני אגיע"
+YES_ATTENDING= "כן, אני אגיע!"
 NOT_ATTENDING ="לצערי לא אגיע"
 MAYBE_ATTENDING = "עוד לא הוחלט"
 
