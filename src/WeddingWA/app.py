@@ -19,14 +19,16 @@ from .common_types import *
 
 def verify_legal_send(template, wedding_row, invitee_row):
     template_id = template.split('-')[0]
-    if template_id == 'invite' and invitee_row['state'] != 'waiting' and invitee_row['status'] in ['read', 'delivered']:
+    if invitee_row['phone'] is None:
+        return "Cannot send invite to null phone: {}".format(invitee_row)
+    elif template_id == 'invite' and invitee_row['state'] != 'waiting' and invitee_row['status'] in ['read', 'delivered']:
         return "Already sent invite to {}".format(invitee_row)
     elif template_id == 'reminder': 
         if invitee_row['confirmed'].isdigit() and invitee_row['confirmed'] != '0':
             return f"Cannot send reminder to {invitee_row}"
         elif invitee_row['state'] == 'remind' and invitee_row['status'] not in ['read', 'delivered']:
             pass
-        elif invitee_row['state'] not in ['invite']:
+        elif invitee_row['state'] not in ['invite', 'sent']: #TODO: remove the sent
             return f"Cannot send reminder to {invitee_row}"
     return None
     
