@@ -68,7 +68,7 @@ async def handle_data(data):
                 return
             
             elif message_type == "button":
-                message = data['button'].get('text')
+                message = data['entry'][0]['changes'][0]['value']['messages'][0]['button'].get('text')
                 await send_read_receipt(data)
                 id = messenger.get_message_id(data)
                 await handle_incoming_message(message, mobile, name, id)
