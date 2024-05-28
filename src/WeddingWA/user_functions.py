@@ -145,6 +145,7 @@ def invite_users(
 
 def main():
     send_reminder('972548826569')
+    send_reminder('972548826569')
 
 if __name__ == '__main__':
     main()
