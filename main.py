@@ -21,8 +21,6 @@ WeddingWA.startup()
 ## Init routers:
 # -----------------
 # @app.get("/")
-app.add_api_route("/", WeddingWA.wa.verify_wa_token , methods=["GET"])
-app.add_api_route("/", WeddingWA.wa.wa_in_webhook , methods=["POST"])
 app.add_api_route("/wa_hook/", WeddingWA.wa.verify_wa_token , methods=["GET"])
 app.add_api_route("/wa_hook/", WeddingWA.wa.wa_in_webhook , methods=["POST"])
 
