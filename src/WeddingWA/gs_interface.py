@@ -2,7 +2,8 @@ import logging, os
 from fastapi import Response, Request
 
 # ==================================================================
-async def update_row_with_form_answer(answers):
+async def update_row_with_form_answer(fields):
+    answers = fields.copy()
     logging.info(f"Updating spreadsheet {docname} with {answers}") 
     phone = answers.pop('phone', None)
     return update_row(phone, **answers)

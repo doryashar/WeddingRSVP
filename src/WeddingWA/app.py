@@ -105,7 +105,7 @@ async def got_new_form_update(request: Request):
     answers = convert_form_to_row(answers)
     logging.debug("Received update_row req with path_params: %s, query_params: %s, json: %s", path_params, params, rj)
     await gs.update_row_with_form_answer(answers)
-    if not await db.update_row(phone=answers.get('phone'), **answers):
+    if not await db.update_row(**answers):
         return Response(status_code=404, content="Error occured")
     return Response(status_code=200, content="OK")
     
