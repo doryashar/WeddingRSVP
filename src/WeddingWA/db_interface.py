@@ -82,6 +82,7 @@ async def update_tables_by(bys, tables=[WEDDING_TABLE, MESSAGES_TABLE], **fields
             logging.error(f"trying to update table {table} by {bys} with fields: {fields} failed with exception: {exp}")
             return False
     logging.error(f'did not find {bys} in {tables}')
+    supabase.table(ERRORS_TABLE).insert({"timestamp": str(datetime.now()), 'message' : f"{fields}"})
     return False
     
         
@@ -90,6 +91,7 @@ async def update_row(phone=None, wedding_id=0, uid=None, tables=[WEDDING_TABLE, 
         bys = [('phone', phone)] #, ('wedding_id', wedding_id)]
     else:
         bys = [('uid', uid)]
+    
     res = await update_tables_by(bys, tables=tables, **fields)
     if not res:
         #TODO: insert to errors table?
