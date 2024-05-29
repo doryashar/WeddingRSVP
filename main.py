@@ -23,6 +23,8 @@ WeddingWA.startup()
 # @app.get("/")
 app.add_api_route("/", WeddingWA.wa.verify_wa_token , methods=["GET"])
 app.add_api_route("/", WeddingWA.wa.wa_in_webhook , methods=["POST"])
+app.add_api_route("/wa_hook/", WeddingWA.wa.verify_wa_token , methods=["GET"])
+app.add_api_route("/wa_hook/", WeddingWA.wa.wa_in_webhook , methods=["POST"])
 
 app.add_api_route("/send-message-id/{wedding_id}/{message}/{phone_number}", WeddingWA.send_message_id , methods=["GET"])
 app.add_api_route("/send-template-id/{wedding_id}/{template_id}/{phone_number}", WeddingWA.send_template_id , methods=["GET"])
