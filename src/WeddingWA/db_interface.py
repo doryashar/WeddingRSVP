@@ -87,7 +87,7 @@ async def update_tables_by(bys, tables=[WEDDING_TABLE, MESSAGES_TABLE], **fields
         
 async def update_row(phone=None, wedding_id=0, uid=None, tables=[WEDDING_TABLE, MESSAGES_TABLE], **fields):
     if uid is None:
-        bys = [('phone', phone), ('wedding_id', wedding_id)]
+        bys = [('phone', phone)] #, ('wedding_id', wedding_id)]
     else:
         bys = [('uid', uid)]
     res = await update_tables_by(bys, tables=tables, **fields)
