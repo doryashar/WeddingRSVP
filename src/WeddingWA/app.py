@@ -69,6 +69,11 @@ def get_new_message_id(row, message):
     # else if message is digits:
     elif curr_state in ['followup-guest-num', 'invite', 'remind'] and message.isdigit():
         return 'filled'
+    elif curr_state in ['answered'] and message.isdigit():
+        return 'updated'
+    elif curr_state in ['answered']:
+        return 'request_added-0'
+    
     # elif curr_state=='followup-answered':
     #     return 'filled'
     return None
@@ -87,7 +92,7 @@ def update_fields(fields, message, curr_row):
     if  message == NOT_ATTENDING: #curr_state in ['invite', 'remind'] and
         # fields['state'] = 'answered'
         fields['confirmed'] = '0'
-    elif  message == YES_ATTENDING and curr_row['confirmed'] == '0':
+    elif message == YES_ATTENDING and curr_row['confirmed'] == '0':
         fields['confirmed'] = ''
     elif curr_row['state'] in ['invite', 'remind', 'followup-guest-num', 'answered'] and message.isdigit(): #message == YES_ATTENDING:
         fields['confirmed'] = message
