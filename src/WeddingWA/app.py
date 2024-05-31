@@ -26,7 +26,7 @@ def verify_legal_send(template, wedding_row, invitee_row):
     elif template_id == 'reminder': 
         # if invitee_row['state'] in ['answered']:
         #     return f"Cannot send reminder to {invitee_row} (already answered)" #But not confirmed
-        if invitee_row['confirmed'].isdigit() and invitee_row['confirmed'] != '0':
+        if invitee_row['confirmed'] is not None and invitee_row['confirmed'].isdigit() and invitee_row['confirmed'] != '0':
             return f"Cannot send reminder to {invitee_row}"
         elif invitee_row['state'] == 'remind' and invitee_row['status'] not in ['read', 'delivered']:
             pass
