@@ -1,7 +1,6 @@
 from .common_types import *
-def get_invite0(phone_number, name, host, date, hour, location, city, url=None, header_image="https://i.ibb.co/HpsM474/Whats-App-Image-2024-05-18-at-22-14-04.jpg", *args, **kwargs):
-    if url is None:
-        url = f'rsvp/{enc_phone(phone_number)}'
+def get_invite0(phone_number, name, host, date, hour, location, city, header_image="https://i.ibb.co/HpsM474/Whats-App-Image-2024-05-18-at-22-14-04.jpg", *args, **kwargs):
+    url = f'rsvp/{enc_phone(kwargs.get('uid'))}'
     return  {
         'template':'general_wedding', 
         'recipient_id':phone_number, 
