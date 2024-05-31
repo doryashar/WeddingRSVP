@@ -31,7 +31,7 @@ TEMPLATE_TYPES: List[str] = [
     'wedding_day_accepted',
     'post_wedding',
 ]
-
+BASE_URL = 'http://wedding.yashar.us'
 BASE_ENC = 432523595431
 LITTLE_ENC = 4324
 
