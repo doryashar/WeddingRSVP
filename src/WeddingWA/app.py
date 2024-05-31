@@ -269,6 +269,17 @@ async def get_google_calendar(request: Request):
     url = "https://calendar.google.com/calendar/event?action=TEMPLATE&tmeid=N2I4MmxmcG11aWNhdXI2ZWZwZnAwa3JiZGMgZDAzY2Y2Y2NjZDU5YTYzMGQ4NTQ0YTBkY2RjOTIwODA4NWM0MzQyN2IxNTU0Nzk1YTQwYTZkMzZmM2JlOTY4Y0Bn&tmsrc=d03cf6cccd59a630d8544a0dcdc9208085c43427b1554795a40a6d36f3be968c%40group.calendar.google.com"
     return RedirectResponse(url, status_code=302)
 
+# app.add_route("/send-invites/{phone_number}/{name}", WeddingWA.send_invite, ["GET"])
+async def send_invite(phone_number, name):
+    if phone_number == None or name == None:
+        logging.error(f"Invalid invite: {phone_number}({name})")
+        return Response(status_code=400, content="Invalid phone number")
+    
+    wedding_id = 0
+    template_id = 'invite-0'
+    db.init_user_row(phone_number, wedding_id=wedding_id, name=name)
+    return send_template_id(wedding_id, template_id, phone_number)
+
 # =============================================================================== #
 
 def startup():

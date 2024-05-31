@@ -19,7 +19,7 @@ def send_invite(phone_number, name):
         logging.error(f"Invalid invite: {phone_number}({name})")
         return 0
     try:
-        res = requests.get(f"http://rsvp.yashar.us/send-invite/{phone_number}/{name}")
+        res = requests.get(f"https://wedding.yashar.us/send-invite/{phone_number}/{name}")
         if res.status_code == 200:
             logging.info(f"Sent invite to {name} {phone_number}")
             return 1
@@ -144,7 +144,9 @@ def invite_users(
         logging.error("Sent no invites")
 
 def main():
-    send_reminder('972548826569')
+    send_invite('972548826569')
+    # df, wks = get_list_of_invites()
+    # send_reminder('972548826569')
     # send_reminder('972528343166')
 
 if __name__ == '__main__':
