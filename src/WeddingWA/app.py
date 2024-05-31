@@ -69,7 +69,7 @@ def get_new_message_id(row, message):
     #     return None
         
     # else if message is digits:
-    elif curr_state in ['followup-guest-num'] and message.isdigit(): #, 'invite', 'remind'
+    elif curr_state in ['followup-guest-num', 'remind', 'invite'] and message.isdigit(): #
         return 'filled'
     elif curr_state in ['followup-guest-num'] and not message.isdigit():
         return 'not-filled'
