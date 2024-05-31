@@ -144,9 +144,9 @@ def invite_users(
         logging.error("Sent no invites")
 
 def main():
-    send_invite('972548826569', 'דור ישר')
+    # send_invite('972548826569', 'דור ישר')
     # send_invite('972545670739', 'ליאב')
-    # send_invite('972548826569', 'שמרית')
+    send_invite('972548006799', 'שמרית')
     # df, wks = get_list_of_invites()
     # send_reminder('972548826569')
     # send_reminder('972528343166')

@@ -24,6 +24,8 @@ def verify_legal_send(template, wedding_row, invitee_row):
     elif template_id == 'invite' and invitee_row['state'] != 'waiting' and invitee_row['status'] in ['read', 'delivered']:
         return "Already sent invite to {}".format(invitee_row)
     elif template_id == 'reminder': 
+        # if invitee_row['state'] in ['answered']:
+        #     return f"Cannot send reminder to {invitee_row} (already answered)" #But not confirmed
         if invitee_row['confirmed'].isdigit() and invitee_row['confirmed'] != '0':
             return f"Cannot send reminder to {invitee_row}"
         elif invitee_row['state'] == 'remind' and invitee_row['status'] not in ['read', 'delivered']:
@@ -67,8 +69,10 @@ def get_new_message_id(row, message):
     #     return None
         
     # else if message is digits:
-    elif curr_state in ['followup-guest-num', 'invite', 'remind'] and message.isdigit():
+    elif curr_state in ['followup-guest-num'] and message.isdigit(): #, 'invite', 'remind'
         return 'filled'
+    elif curr_state in ['followup-guest-num'] and not message.isdigit():
+        return 'not-filled'
     elif curr_state in ['answered'] and message.isdigit():
         return 'updated'
     elif curr_state in ['answered']:
