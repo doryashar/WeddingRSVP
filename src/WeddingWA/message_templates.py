@@ -3,7 +3,7 @@ def get_invite0(phone_number, name, host, date, hour, location, city, url=None, 
     if url is None:
         url = f'{BASE_URL}/rsvp/{enc_phone(phone_number)}'
     return  {
-        'template':'TBD', 
+        'template':'general_wedding', 
         'recipient_id':phone_number, 
         'components':[
             {
