@@ -76,7 +76,7 @@ def get_new_message_id(row, message):
     elif curr_state in ['answered'] and message.isdigit():
         return 'updated'
     elif curr_state in ['answered']:
-        return 'request_added-0'
+        return 'request_added'
     
     # elif curr_state=='followup-answered':
     #     return 'filled'

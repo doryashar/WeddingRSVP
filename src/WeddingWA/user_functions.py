@@ -37,13 +37,13 @@ def send_reminder(phone_number):
     try:
         res = requests.get(f"https://wedding.yashar.us/send-template-id/0/reminder-0/{phone_number}")
         if res.status_code == 200:
-            logging.info(f"Sent invite to {phone_number}")
+            logging.info(f"Sent reminder to {phone_number}")
             return 1
         else:
-            logging.error(f"Failed to send invite to {phone_number}: \n{res.status_code} => {res.text}")
+            logging.error(f"Failed to send reminder to {phone_number}: \n{res.status_code} => {res.text}")
             return 0
     except Exception as e:
-        logging.error(f"Failed to send invite to {phone_number}: \n{e}")
+        logging.error(f"Failed to send reminder to {phone_number}: \n{e}")
         return 0
     
 def send_invitations(list_of_invites, limit):
@@ -143,12 +143,12 @@ def invite_users(
     else:
         logging.error("Sent no invites")
 
+# =================================
+
 def main():
     # send_invite('972548826569', 'דור ישר')
-    # send_invite('972545670739', 'ליאב')
-    send_invite('972548006799', 'שמרית')
     # df, wks = get_list_of_invites()
-    # send_reminder('972548826569')
+    send_reminder('972548826569')
     # send_reminder('972528343166')
 
 if __name__ == '__main__':
