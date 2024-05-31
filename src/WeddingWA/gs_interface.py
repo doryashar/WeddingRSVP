@@ -13,7 +13,10 @@ async def update_row_with_form_answer(fields):
 def save_wks(wks, df):
     df = df.fillna('') #To fix: Out of range float values are not JSON compliant
     wks.update([df.columns.values.tolist()] + df.values.tolist())
-        
+
+def insert_row(phone, name, **fields):
+    pass #TODO: fill
+
 def update_row(phone, **fields):
     try:
         dataframe = pd.DataFrame(wks.get_all_records())
