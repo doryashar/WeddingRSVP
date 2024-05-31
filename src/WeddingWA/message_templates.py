@@ -1,4 +1,4 @@
-from common_types import *
+from .common_types import *
 def get_invite0(phone_number, name, host, date, hour, location, city, url=None, header_image="https://i.ibb.co/HpsM474/Whats-App-Image-2024-05-18-at-22-14-04.jpg", *args, **kwargs):
     if url is None:
         url = f'{BASE_URL}/rsvp/{enc_phone(phone_number)}'
