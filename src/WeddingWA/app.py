@@ -279,7 +279,7 @@ async def send_invite(phone_number, name):
     template_id = 'invite-0'
     gs.insert_row(phone_number, name)
     db.init_user_row(phone_number, wedding_id=wedding_id, name=name)
-    return send_template_id(wedding_id, template_id, phone_number)
+    return await send_template_id(wedding_id, template_id, phone_number)
 
 # =============================================================================== #
 
