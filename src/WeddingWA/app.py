@@ -112,7 +112,7 @@ async def got_new_form_update(request: Request):
     rj = await request.json()
     answers = {q['name']:str(q['value']).strip() for q in rj['submission']['questions']}
     answers = convert_form_to_row(answers)
-    logging.debug("Received update_row req with path_params: %s, query_params: %s, json: %s", path_params, params, rj)
+    logging.info("Received update_row req with path_params: %s, query_params: %s, json: %s", path_params, params, rj)
     await gs.update_row_with_form_answer(answers)
     if not await db.update_row(**answers, tables=db.WEDDING_TABLE):
         return Response(status_code=404, content="Error occured")
@@ -246,7 +246,8 @@ async def rsvp(request: Request):
     try:
         table, uid, row = await db.get_row(uid=uid, tables=[db.WEDDING_TABLE]) #supabase.table(WEDDING_TABLE).select("*").eq("uid", uid).execute()
         if uid is None:
-            return Response(status_code=404, content=f"Not found ({row})")
+            logging.error("Error getting rsvp for code=%s uid=%s, row=%s", code, uid, row)
+            return Response(status_code=404, content=f"Not found")
         phone = row.get('phone')
         name = row.get('name')
         status = row.get('status')
