@@ -37,7 +37,7 @@ def add_message(phone, message, msgid):
 
 def init_user_row(phone, wedding_id=0, **fields):
     logging.error(f"init_user_row: {phone}, {wedding_id}, {fields}")
-    data = supabase.table(WEDDING_TABLE).select("*").eq("phone", phone).eq("wedding_id", wedding_id).execute()
+    data = supabase.table(WEDDING_TABLE).select("*").eq("phone", phone).execute() #.eq("wedding_id", wedding_id)
     if len(data.data) == 0:
         return supabase.table(WEDDING_TABLE).insert({"phone": phone, "wedding_id": wedding_id, "state": "waiting", "timestamp": str(datetime.now()), **fields}).execute()
     else:

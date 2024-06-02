@@ -116,8 +116,8 @@ def clean_df(df):
     df['phone'] = df['phone'].apply(fix_phone) # clean_list['phone'].replace('[^0-9]','', regex=True,inplace=True)
     return df
 
-def filter_df(df, priority=1, status='None'):
-    cond = lambda k:k['phone'] != '' and (priority is None or k['priority'] == priority) and (status is None or k['status'] == status)
+def filter_df(df, priority=1, state='None'):
+    cond = lambda k:k['phone'] != '' and (priority is None or k['priority'] == priority) and (state is None or k['status'] == state)
     df = df[df.apply(cond, axis=1)]
     return df
 
@@ -126,28 +126,53 @@ def filter_df(df, priority=1, status='None'):
 # =================================
 
 
-def invite_users(
-    limit = 10,
-    run_priority = None,
-    run_status = 'None'
-    ):
-    df, wks = get_list_of_invites()
-    new_df = clean_df(df)
-    new_df = filter_df(df, run_priority, run_status)
-    logging.info(f"Sending {max(limit,len(new_df))} new invites")
-    k = send_invitations(new_df, limit)
-    if k:
-        logging.info(f"Sent {k} invites. Saving new data")
-        # df.loc[new_df.index] = new_df
-        # save_wks(wks, df)
-    else:
-        logging.error("Sent no invites")
+# def invite_users(
+#     limit = 10,
+#     run_priority = '1', #None,
+#     run_status = None, #'None'
+#     ):
+#     df, wks = get_list_of_invites()
+#     new_df = clean_df(df)
+#     new_df = filter_df(df, run_priority, run_status)
+#     logging.info(f"Sending {max(limit,len(new_df))} new invites")
+#     k = send_invitations(new_df, limit)
+#     if k:
+#         logging.info(f"Sent {k} invites. Saving new data")
+#         # df.loc[new_df.index] = new_df
+#         # save_wks(wks, df)
+#     else:
+#         logging.error("Sent no invites")
 
+    
+# def send_reminders(list_of_invites, limit):
+#     k = 0
+#     for i, row in list_of_invites[:limit].iterrows():
+#         if send_invite(row['phone'], row['full name']) == 1:
+#             list_of_invites.loc[i, 'status'] = 'sent'
+#             k+=1
+#         else:
+#             list_of_invites.loc[i, 'status'] = 'error'
+#         time.sleep(1)
+#     return k
 # =================================
 
 def main():
-    # send_invite('972524232229', 'בר')
+    limit = 10,
+    run_priority = 1
+    run_state = None #'sent'
+    count = 0
     df, wks = get_list_of_invites()
+    new_df = clean_df(df)
+    new_df = filter_df(new_df, run_priority, run_state)
+    logging.info(f"Will send reminders to \n{new_df['full name']}")#[:limit]}")
+    time.sleep(5)
+    
+    for i, row in new_df[:limit].iterrows():
+        logging.info(f"Sending reminder to {row['phone']}")
+        count += send_reminder(row['phone'])
+    logging.info(f"Sent {count} reminders")
+    
+    # send_invite('972527780577', 'אוהד ישר')
     # send_reminder('972548826569')
     # send_reminder('972528343166')
 
