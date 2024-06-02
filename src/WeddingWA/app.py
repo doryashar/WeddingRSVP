@@ -244,7 +244,7 @@ async def rsvp(request: Request):
     logging.info("Received rsvp req: %s", code)
     uid = dec_phone(code)
     try:
-        table, uid, row = await db.get_row(uid=uid, tables=[db.WEDDING_TABLE]) #supabase.table(WEDDING_TABLE).select("*").eq("uid", uid).execute()
+        table, uid, row = await db.get_row(uid=uid, tables=["messages"])#TODO: fix #supabase.table(WEDDING_TABLE).select("*").eq("uid", uid).execute()
         if uid is None:
             logging.error("Error getting rsvp for code=%s uid=%s, row=%s", code, uid, row)
             return Response(status_code=404, content=f"Not found")

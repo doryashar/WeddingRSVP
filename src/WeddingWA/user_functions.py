@@ -177,8 +177,6 @@ def main():
     # send_reminder('972528343166')
 
 if __name__ == '__main__':
-    main()
+    
+    # main()
     # update_check()
-    
-    
-    
