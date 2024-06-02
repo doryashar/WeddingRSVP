@@ -156,7 +156,7 @@ def filter_df(df, priority=1, state='None'):
 #     return k
 # =================================
 
-def main():
+def send_reminders():
     limit = 10,
     run_priority = 1
     run_state = None #'sent'
@@ -171,12 +171,16 @@ def main():
         logging.info(f"Sending reminder to {row['phone']}")
         count += send_reminder(row['phone'])
     logging.info(f"Sent {count} reminders")
+
+# =================================
     
-    # send_invite('972527780577', 'אוהד ישר')
+def main():
+    send_invite('972524881765', 'רינה ערוסי')
+    # send_invite('972542240380', 'אבי ערוסי')
+    
     # send_reminder('972548826569')
     # send_reminder('972528343166')
 
 if __name__ == '__main__':
-    
-    # main()
+    main()
     # update_check()
