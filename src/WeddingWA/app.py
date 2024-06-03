@@ -30,6 +30,8 @@ def verify_legal_send(template, wedding_row, invitee_row):
             return f"Cannot send reminder to {invitee_row}"
         elif invitee_row['state'] == 'remind' and invitee_row['status'] not in ['read', 'delivered']:
             pass
+        elif invitee_row['state'] == 'remind' and (datetime.now() - invitee_row['timestamp']).days > 1:
+            pass
         elif invitee_row['state'] not in ['invite', 'sent']: #TODO: remove the sent
             return f"Cannot send reminder to {invitee_row}"
     return None
