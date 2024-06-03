@@ -209,7 +209,7 @@ async def send_message(message, phone_number):
     status = "accepted" if res.status_code == 200 else "failed" #TODO: res['messages'][0]['message_status']?
     timestamp = str(datetime.now())
     update_fields = {
-        "history" : invitee_row['history'] + f"{(timestamp, msgid, message_id, status)}",
+        "history" : invitee_row['history'] + f"{(timestamp, message, status)}",
         "timestamp": timestamp
     }
     invitee_row.update(update_fields)
