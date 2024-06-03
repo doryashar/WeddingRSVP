@@ -197,6 +197,26 @@ async def send_message_id(wedding_id, message_id, phone_number):
     gs.update_row(**invitee_row)
     return res
 
+# =============================================================================== #
+    
+# app.add_route("/send-message/{phone_number}/{message}", WeddingWA.send_message , ["GET"])
+async def send_message(message, phone_number): 
+    #get message by id, wedding by id and create a message
+    _,uid, invitee_row = await db.get_row(phone_number, tables=[db.WEDDING_TABLE]) 
+    if uid is None:
+        return Response(status_code=404, content=f"Not found {uid}")
+    res = await wa.send_message(phone_number, message)
+    status = "accepted" if res.status_code == 200 else "failed" #TODO: res['messages'][0]['message_status']?
+    timestamp = str(datetime.now())
+    update_fields = {
+        "history" : invitee_row['history'] + f"{(timestamp, msgid, message_id, status)}",
+        "timestamp": timestamp
+    }
+    invitee_row.update(update_fields)
+    await db.update_row(**invitee_row)
+    gs.update_row(**invitee_row)
+    return res
+
 # app.add_route("/send-template-id/{wedding_id}/{template_id}/{phone_number}", WeddingWA.send_template , ["GET"])
 async def send_template_id(wedding_id, template_id, phone_number): 
     wedding_row = await db.get_wedding_by_id(wedding_id) 
