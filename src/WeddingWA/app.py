@@ -270,7 +270,7 @@ async def rsvp(request: Request):
     logging.info("Received rsvp req: %s", code)
     uid = dec_phone(code)
     try:
-        tables = ["messages"] if int(uid) < 477 else [db.WEDDING_TABLE]
+        tables = [db.WEDDING_TABLE] #["messages"] if int(uid) < 477 else [db.WEDDING_TABLE]
         table, uid, row = await db.get_row(uid=uid, tables=tables) #supabase.table(WEDDING_TABLE).select("*").eq("uid", uid).execute()
         if uid is None:
             logging.error("Error getting rsvp for code=%s uid=%s, row=%s", code, uid, row)

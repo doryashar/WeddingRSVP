@@ -182,6 +182,34 @@ def send_reminders(
     logging.info(f"Sent {count} reminders")
 
 # =================================
+def here():
+    import db_interface as db
+    res = db.supabase.table("messages").select("*").execute()
+    old = [(item['phone'], item['uid']) for item in res.data if item['message'] == 'wedding_invite_0']
+    for phone, uid in old:
+        print(f"({phone}) Old uid: {uid}")
+        # time.sleep(1)
+        row = db.supabase.table("wedding_statuses").select("*").eq("uid", uid).execute()
+        if len(row.data) == 1:
+            row = row.data[0]
+            row['history'] = row['history'] + f"\nOld uid: {row['uid']}" if row['history'] else f"Old uid: {row['uid']}"
+            new_uid = str(int(row['uid']) + 1000)
+            row['uid'] = new_uid
+            logging.info(f"({phone}) Updating uid from {uid} to {new_uid}")
+            db.supabase.table("wedding_statuses").update(row).eq("uid", uid).execute()
+    
+    for phone, uid in old:
+        row = db.supabase.table("wedding_statuses").select("*").eq("phone", phone).execute()
+        if len(row.data) == 1:
+            row = row.data[0]
+            row['history'] = row['history'] + f"\nOld uid: {row['uid']}" if row['history'] else f"Old uid: {row['uid']}"
+            new_uid = uid 
+            old_uid = row['uid']
+            row['uid'] = new_uid
+            logging.info(f"({phone}) Updating uid from {old_uid} to {new_uid}")
+            db.supabase.table("wedding_statuses").update(row).eq("uid", old_uid).execute()
+        else:
+            logging.info(f"({phone}) No uid found")
     
 def main():
     
@@ -213,5 +241,5 @@ def main():
     pass
 
 if __name__ == '__main__':
-    main()
+    here()
     # update_check()
