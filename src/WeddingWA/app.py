@@ -149,7 +149,7 @@ async def got_new_wa_message(msgid, phone_number, status="received", message=Non
         
     fields = dict()
     # add to history
-    fields['history'] = row['history'] + f"{(timestamp, msgid, message, status)}"
+    fields['history'] = row['history'] + f"{(timestamp, msgid, message, status)}" if row['history'] else f"{(timestamp, msgid, message, status)}"
     
     # get the new fields
     curr_state = row['state']

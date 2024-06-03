@@ -191,8 +191,26 @@ def main():
     # res = requests.get(f"https://wedding.yashar.us/send-message/972542240380/{message}")
 
     # send_reminder('972528289301')
-    send_reminder('972528289303')
+    # send_reminder('972528289303')
     # send_reminders()
+
+    # numbers = [
+    #     "972544528600",
+    #     "972526684445",
+    #     "972543139700",
+    #     "972544664490",
+    #     "972504844434",
+    #     "972544207796",
+    #     "972546766444",
+    #     "972544564701"
+    #     ]
+    # for phone_number in numbers:
+    #     res = requests.get(f"https://wedding.yashar.us/send-template-id/0/invite-0/{phone_number}")
+    #     if res.status_code != 200:
+    #         print(f"Error for {phone_number}: \n{res.status_code} => {res.text}")
+    #     else:
+    #         print(f"Sent reminder to {phone_number}")
+    pass
 
 if __name__ == '__main__':
     main()
