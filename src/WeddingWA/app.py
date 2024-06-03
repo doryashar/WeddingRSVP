@@ -206,6 +206,7 @@ async def send_message(message, phone_number):
     if uid is None:
         return Response(status_code=404, content=f"Not found {uid}")
     res = await wa.send_message(phone_number, message)
+    logging.info(f"Got response for send_message: {res}")
     status = "accepted" if res.status_code == 200 else "failed" #TODO: res['messages'][0]['message_status']?
     timestamp = str(datetime.now())
     update_fields = {
