@@ -122,6 +122,7 @@ async def got_new_form_update(request: Request):
     return Response(status_code=200, content="OK")
     
 async def got_new_wa_delivery(delivery_status, msg_id, phone_number, timestamp):
+    timestamp = str(datetime.now()) #TODO: remove
     bys = [("phone", phone_number), ("msgid", msg_id)]
     table, uid, row = await db.get_row_by(bys)
     if uid is None:
