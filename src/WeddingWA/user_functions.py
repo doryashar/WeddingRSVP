@@ -183,8 +183,9 @@ def main():
     # message = 'היי אבי, ראינו שהיתה לנו תקלה אשר מנעה ממך להכנס לטופס אישור ההגעה. התקלה תוקנה.'
     # res = requests.get(f"https://wedding.yashar.us/send-message/972542240380/{message}")
 
-    # send_reminder('972548826569')
-    send_reminders()
+    send_reminder('972548826569')
+    send_reminder('972548826569')
+    # send_reminders()
 
 if __name__ == '__main__':
     main()
