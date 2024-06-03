@@ -186,12 +186,12 @@ def send_reminders(
 def main():
     
     # send_invite('972542240380', 'אבי ערוסי')
-    send_invite('972505398215', 'מורדכי וגקלין לוי')
+    # send_invite('972505398215', 'מורדכי וגקלין לוי')
     # message = 'היי אבי, ראינו שהיתה לנו תקלה אשר מנעה ממך להכנס לטופס אישור ההגעה. התקלה תוקנה.'
     # res = requests.get(f"https://wedding.yashar.us/send-message/972542240380/{message}")
 
-    send_reminder('972528289301')
-    # send_reminder('972528289303')
+    # send_reminder('972528289301')
+    send_reminder('972528289303')
     # send_reminders()
 
 if __name__ == '__main__':

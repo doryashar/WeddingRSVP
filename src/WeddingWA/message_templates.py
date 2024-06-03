@@ -35,7 +35,7 @@ def get_reminder0(phone_number, name, host, date, hour, location, city, *args, *
         'recipient_id':phone_number, 
         'components':[
             {"type": "body",  "parameters": [
-                {"type": "text", "text": name},
+                {"type": "text", "text": host},
                 ]
              },
         ],
