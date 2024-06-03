@@ -247,8 +247,9 @@ async def send_template_id(wedding_id, template_id, phone_number):
         resp = Response(status_code=200, content="Success")
     new_state = get_new_state(invitee_row, template_id, status)
     timestamp = str(datetime.now())
+    new_history = invitee_row['history'] + f"{(timestamp, msgid, template_id, status)}" if invitee_row['history'] else f"{(timestamp, msgid, template_id, status)}"
     invitee_row.update({
-        "history" : invitee_row['history'] + f"{(timestamp, msgid, template_id, status)}",
+        "history" : new_history,
         "msgid"   : msgid,
         "message" : template_id,
         "status"  : status,
