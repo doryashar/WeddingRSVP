@@ -182,7 +182,7 @@ def send_reminders(
     logging.info(f"Sent {count} reminders")
 
 # =================================
-def here():
+def fix_table():
     import db_interface as db
     res = db.supabase.table("messages").select("*").execute()
     old = [(item['phone'], item['uid']) for item in res.data if item['message'] == 'wedding_invite_0']
@@ -213,7 +213,7 @@ def here():
     
 def main():
     
-    # send_invite('972542240380', 'אבי ערוסי')
+    # send_reminder('972542240380') #, 'אבי ערוסי')
     # send_invite('972505398215', 'מורדכי וגקלין לוי')
     # message = 'היי אבי, ראינו שהיתה לנו תקלה אשר מנעה ממך להכנס לטופס אישור ההגעה. התקלה תוקנה.'
     # res = requests.get(f"https://wedding.yashar.us/send-message/972542240380/{message}")
@@ -226,20 +226,28 @@ def main():
     #     "972544528600",
     #     "972526684445",
     #     "972543139700",
-    #     "972544664490",
-    #     "972504844434",
-    #     "972544207796",
-    #     "972546766444",
-    #     "972544564701"
-    #     ]
+    # ]
+    
+    numbers = [
+        "972544664490",
+        "972504844434",
+        "972544207796",
+        "972546766444",
+        "972544564701"
+        ]
+        
     # for phone_number in numbers:
     #     res = requests.get(f"https://wedding.yashar.us/send-template-id/0/invite-0/{phone_number}")
     #     if res.status_code != 200:
     #         print(f"Error for {phone_number}: \n{res.status_code} => {res.text}")
     #     else:
     #         print(f"Sent reminder to {phone_number}")
+    for phone_number in numbers:
+        res = send_reminder(phone_number)
+        print(f"Sent reminder to {phone_number}: {res}")
+        
     pass
 
 if __name__ == '__main__':
-    here()
+    main()
     # update_check()
