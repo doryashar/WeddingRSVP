@@ -117,7 +117,7 @@ def clean_df(df):
     return df
 
 def filter_df(df, priority=1, state='None'):
-    cond = lambda k:k['phone'] != '' and (priority is None or k['priority'] == priority) and (state is None or k['status'] == state)
+    cond = lambda k:k['phone'] != '' and (priority is None or k['priority'] == priority) and (state is None or k['state'] == state)
     df = df[df.apply(cond, axis=1)]
     return df
 
@@ -157,23 +157,23 @@ def filter_df(df, priority=1, state='None'):
 # =================================
 
 def send_reminders(
-    limit = 10,
-    run_priority = 1,
-    run_state = None, #'sent'
+    limit = 30,
+    run_priority = None,
+    run_state = 'sent'
     ):
-    from db_interface import update_row
-    import asyncio
 
     count = 0
     df, wks = get_list_of_invites()
     new_df = clean_df(df)
     new_df = filter_df(new_df, run_priority, run_state)
-    logging.info(f"Will send reminders to \n{new_df['full name']}")#[:limit]}")
+    logging.info(f"Will send reminders to \n{new_df['full name'][:limit]} out of {len(new_df)}")#}")
     time.sleep(5)
     
-    for i, row in new_df[:limit].iterrows():
-        logging.info(f"Sending reminder to {row['phone']}")
-        asyncio.run(update_row(phone=row['phone'], state='sent', confirmed=None))
+    # from db_interface import update_row
+    # import asyncio
+    # for i, row in new_df[:limit].iterrows():
+    #     logging.info(f"Sending reminder to {row['phone']}")
+    #     asyncio.run(update_row(phone=row['phone'], state='sent', confirmed=None))
         
     for i, row in new_df[:limit].iterrows():
         logging.info(f"Sending reminder to {row['phone']}")
@@ -220,21 +220,9 @@ def main():
 
     # send_reminder('972528289301')
     # send_reminder('972528289303')
-    # send_reminders()
-
-    # numbers = [
-    #     "972544528600",
-    #     "972526684445",
-    #     "972543139700",
-    # ]
     
-    numbers = [
-        "972544664490",
-        "972504844434",
-        "972544207796",
-        "972546766444",
-        "972544564701"
-        ]
+    send_reminders()
+
         
     # for phone_number in numbers:
     #     res = requests.get(f"https://wedding.yashar.us/send-template-id/0/invite-0/{phone_number}")
@@ -242,9 +230,10 @@ def main():
     #         print(f"Error for {phone_number}: \n{res.status_code} => {res.text}")
     #     else:
     #         print(f"Sent reminder to {phone_number}")
-    for phone_number in numbers:
-        res = send_reminder(phone_number)
-        print(f"Sent reminder to {phone_number}: {res}")
+    
+    # for phone_number in numbers:
+    #     res = send_reminder(phone_number)
+    #     print(f"Sent reminder to {phone_number}: {res}")
         
     pass
 

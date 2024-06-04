@@ -19,7 +19,7 @@ EXPOSE 80
 # # configure the container to run in an executed manner
 # ENTRYPOINT [ "python" ]
 
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "80", "--reload", "--workers", "4"] 
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "80", "--workers", "4"]  #"--reload", 
 #, "--worker-class", "uvicorn.workers.UvicornWorker"]
 # ["app.py"] 
 #gunicorn main:app --workers 4 --worker-class 
