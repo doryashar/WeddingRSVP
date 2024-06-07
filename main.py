@@ -33,7 +33,7 @@ app.add_api_route("/get_google_cal", WeddingWA.get_google_calendar, methods=["GE
 app.add_api_route("/update_invitee", WeddingWA.got_new_form_update, methods=["POST"])
 app.add_api_route("/send-invite/{phone_number}/{name}", WeddingWA.send_invite, methods=["GET"])
 
-app.add_api_route("/calls/incoming", WeddingWA.calls.incoming, methods=["GET"])
+app.add_api_route("/calls/incoming", WeddingWA.calls.incoming, methods=["GET", "POST"])
 # app.add_api_route("/calls/outgoing", WeddingWA.calls.outgoing, methods=["GET"])
 
 # app.add_api_route("/send-reminder/{phone_number}", WeddingWA.send_reminder , methods=["GET"])
