@@ -34,7 +34,7 @@ def update_row(phone, **fields):
         save_wks(wks, dataframe)
         logging.info(f"Done updating wks {wks}")
     except Exception as exp:
-        logging.error(f"Exception caught in update_row_with_form_answer: {exp}")
+        logging.error(f"Exception caught in update_row: {exp}")
         return Response(status_code=500, content=f"{exp}")
     return Response("Success", status_code=200)
 

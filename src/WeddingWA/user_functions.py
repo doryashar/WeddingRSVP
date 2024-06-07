@@ -126,22 +126,22 @@ def filter_df(df, priority=1, state='None'):
 # =================================
 
 
-# def invite_users(
-#     limit = 10,
-#     run_priority = '1', #None,
-#     run_status = None, #'None'
-#     ):
-#     df, wks = get_list_of_invites()
-#     new_df = clean_df(df)
-#     new_df = filter_df(df, run_priority, run_status)
-#     logging.info(f"Sending {max(limit,len(new_df))} new invites")
-#     k = send_invitations(new_df, limit)
-#     if k:
-#         logging.info(f"Sent {k} invites. Saving new data")
-#         # df.loc[new_df.index] = new_df
-#         # save_wks(wks, df)
-#     else:
-#         logging.error("Sent no invites")
+def invite_users(
+    limit = 10,
+    run_priority = None,
+    run_state = 'waiting', #'None'
+    ):
+    df, wks = get_list_of_invites()
+    new_df = clean_df(df)
+    new_df = filter_df(df, run_priority, run_state)
+    logging.info(f"Sending {max(limit,len(new_df))} new invites")
+    k = send_invitations(new_df, limit)
+    if k:
+        logging.info(f"Sent {k} invites. Saving new data")
+        # df.loc[new_df.index] = new_df
+        # save_wks(wks, df)
+    else:
+        logging.error("Sent no invites")
 
     
 # def send_reminders(list_of_invites, limit):
@@ -159,7 +159,7 @@ def filter_df(df, priority=1, state='None'):
 def send_reminders(
     limit = 30,
     run_priority = None,
-    run_state = 'sent'
+    run_state = 'remind'
     ):
 
     count = 0
@@ -178,7 +178,7 @@ def send_reminders(
     for i, row in new_df[:limit].iterrows():
         logging.info(f"Sending reminder to {row['phone']}")
         count += send_reminder(row['phone'])
-        time.sleep(2)
+        # time.sleep(2)
     logging.info(f"Sent {count} reminders")
 
 # =================================
@@ -214,16 +214,16 @@ def fix_table():
 def main():
     
     # send_reminder('972542240380') #, 'אבי ערוסי')
-    # send_invite('972505398215', 'מורדכי וגקלין לוי')
-    # message = 'היי אבי, ראינו שהיתה לנו תקלה אשר מנעה ממך להכנס לטופס אישור ההגעה. התקלה תוקנה.'
-    # res = requests.get(f"https://wedding.yashar.us/send-message/972542240380/{message}")
-
-    # send_reminder('972528289301')
+    # send_invite('972523484444', 'ריימן')
+    # message = 'היי ריימן, שלחתי לך זימון מחדש. מתחתנת הבת של שרית ישר.'
+    # res = requests.get(f"https://wedding.yashar.us/send-message/972523484444/{message}")
+    # print(res)
+    
+    # send_reminder('972528444311')
     # send_reminder('972528289303')
     
     send_reminders()
 
-        
     # for phone_number in numbers:
     #     res = requests.get(f"https://wedding.yashar.us/send-template-id/0/invite-0/{phone_number}")
     #     if res.status_code != 200:
@@ -234,7 +234,8 @@ def main():
     # for phone_number in numbers:
     #     res = send_reminder(phone_number)
     #     print(f"Sent reminder to {phone_number}: {res}")
-        
+    
+    # invite_users()
     pass
 
 if __name__ == '__main__':
