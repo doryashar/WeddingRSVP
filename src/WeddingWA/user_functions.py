@@ -5,6 +5,7 @@ import gspread
 import json
 import pandas as pd
 import re, time, os
+from datetime import datetime
 from dotenv import load_dotenv
 
 logging.basicConfig(
@@ -116,8 +117,8 @@ def clean_df(df):
     df['phone'] = df['phone'].apply(fix_phone) # clean_list['phone'].replace('[^0-9]','', regex=True,inplace=True)
     return df
 
-def filter_df(df, priority=1, state='None'):
-    cond = lambda k:k['phone'] != '' and (priority is None or k['priority'] == priority) and (state is None or k['state'] == state)
+def filter_df(df, priority=1, state='None', days=None):
+    cond = lambda k:k['phone'] != '' and (priority is None or k['priority'] == priority) and (state is None or k['state'] == state) and (days is None or k['timestamp'] == '' or (datetime.now() - datetime.fromisoformat(k['timestamp'])).days > days)
     df = df[df.apply(cond, axis=1)]
     return df
 
@@ -157,7 +158,7 @@ def invite_users(
 # =================================
 
 def send_reminders(
-    limit = 30,
+    limit = None,
     run_priority = None,
     run_state = 'remind'
     ):
@@ -165,7 +166,7 @@ def send_reminders(
     count = 0
     df, wks = get_list_of_invites()
     new_df = clean_df(df)
-    new_df = filter_df(new_df, run_priority, run_state)
+    new_df = filter_df(new_df, run_priority, run_state, days=2)
     logging.info(f"Will send reminders to \n{new_df['full name'][:limit]} out of {len(new_df)}")#}")
     time.sleep(5)
     

@@ -6,6 +6,7 @@ from fastapi.responses import RedirectResponse
 from . import db_interface as db
 from . import gs_interface as gs
 from . import wa_interface as wa
+from . import twilio_interface as calls
 from .message_templates import templates
 
 from datetime import datetime
