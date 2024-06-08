@@ -11,6 +11,8 @@ from os import getenv
 import time
 import uvicorn
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
+
 from src.WeddingWA import app as WeddingWA
 
 
@@ -33,6 +35,8 @@ app.add_api_route("/get_google_cal", WeddingWA.get_google_calendar, methods=["GE
 app.add_api_route("/update_invitee", WeddingWA.got_new_form_update, methods=["POST"])
 app.add_api_route("/send-invite/{phone_number}/{name}", WeddingWA.send_invite, methods=["GET"])
 
+
+app.mount("/calls/static", StaticFiles(directory="static"), name="static")
 app.add_api_route("/calls/incoming", WeddingWA.calls.incoming, methods=["GET", "POST"])
 # app.add_api_route("/calls/outgoing", WeddingWA.calls.outgoing, methods=["GET"])
 

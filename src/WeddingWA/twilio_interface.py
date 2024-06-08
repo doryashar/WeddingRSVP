@@ -1,11 +1,17 @@
 from fastapi.responses import Response, RedirectResponse
-
-def incoming():
+from fastapi.requests import Request
+import src.WeddingWA.db_interface as db
+import logging
+async def incoming(request: Request):
     data = """<?xml version="1.0" encoding="UTF-8"?>
 <Response>
-    <Dial>972-548826569</Dial>
+<Play>https://wedding.yashar.us/calls/static/not_avail.mp3</Play><Hangup />
 </Response>
-    """ # <Redirect>http://www.foo.com/nextInstructions</Redirect>
+    """ 
+    # <Redirect>http://www.foo.com/nextInstructions</Redirect>
+    # <Dial>972-548826569</Dial>
+    logging.info(f"Got request: {request}")
+    # res = await db.update_tables_by(("phone", "972548826569"), tables=[db.MESSAGES_TABLE], message=f"")
     return Response(content=data, media_type="application/xml")    
     # return RedirectResponse(f"https://forms.fillout.com/t/xwYB5jKk1Gus?phone={phone}&name={name}", status_code=302)
 

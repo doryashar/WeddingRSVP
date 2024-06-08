@@ -2,13 +2,6 @@ import logging, os
 from fastapi import Response, Request
 
 # ==================================================================
-async def update_row_with_form_answer(fields):
-    answers = fields.copy()
-    logging.info(f"Updating spreadsheet {docname} with {answers}") 
-    phone = answers.pop('phone', None)
-    return update_row(phone, **answers)
-        
-# ==================================================================
 
 def save_wks(wks, df):
     df = df.fillna('') #To fix: Out of range float values are not JSON compliant
@@ -38,6 +31,13 @@ def update_row(phone, **fields):
         return Response(status_code=500, content=f"{exp}")
     return Response("Success", status_code=200)
 
+async def update_row_with_form_answer(fields):
+    answers = fields.copy()
+    logging.info(f"Updating spreadsheet {docname} with {answers}") 
+    phone = answers.pop('phone', None)
+    return update_row(phone, **answers)
+        
+# ==================================================================
 def connect_gspread():
         import gspread, json
         auser = os.getenv('GSPREAD_AUTHORIZED_USER', None)
