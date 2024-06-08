@@ -2,6 +2,7 @@ from fastapi.responses import Response, RedirectResponse
 from fastapi.requests import Request
 import src.WeddingWA.db_interface as db
 import logging
+import re
 async def incoming(request: Request):
     data = """<?xml version="1.0" encoding="UTF-8"?>
 <Response>
@@ -10,11 +11,15 @@ async def incoming(request: Request):
     """ 
     # <Redirect>http://www.foo.com/nextInstructions</Redirect>
     # <Dial>972-548826569</Dial>
-    dat = await request.body()
     logging.info(f"Got request: {dat}")
     logging.info(f"Got request: {request.path_params}")
     logging.info(f"Got request: {request.query_params}")
-    # res = await db.update_tables_by(("phone", "972548826569"), tables=[db.MESSAGES_TABLE], message=f"")
+    dat = await request.body()
+    res = re.match('.*From=%2B(.*?)&.*', dat)
+    if not res:
+        logging.error(f"couldn't match phone from request")
+    phone = res.group(1)
+    res = await db.add_error(message=f"incoming call from {phone}")
     return Response(content=data, media_type="application/xml")    
     # return RedirectResponse(f"https://forms.fillout.com/t/xwYB5jKk1Gus?phone={phone}&name={name}", status_code=302)
 
