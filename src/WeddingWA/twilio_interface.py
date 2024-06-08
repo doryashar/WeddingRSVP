@@ -15,7 +15,8 @@ async def incoming(request: Request):
     logging.info(f"Got request: {dat}")
     logging.info(f"Got request: {request.path_params}")
     logging.info(f"Got request: {request.query_params}")
-    res = re.match('.*From=%2B(.*?)&.*', dat)
+    res = re.match('.*From=%2B(.*?)&.*', dat.decode())
+    #TODO: if res and found this phone - add to request to call him back otherwise add to errors
     if not res:
         logging.error(f"couldn't match phone from request")
     phone = res.group(1)
