@@ -11,10 +11,10 @@ async def incoming(request: Request):
     """ 
     # <Redirect>http://www.foo.com/nextInstructions</Redirect>
     # <Dial>972-548826569</Dial>
+    dat = await request.body()
     logging.info(f"Got request: {dat}")
     logging.info(f"Got request: {request.path_params}")
     logging.info(f"Got request: {request.query_params}")
-    dat = await request.body()
     res = re.match('.*From=%2B(.*?)&.*', dat)
     if not res:
         logging.error(f"couldn't match phone from request")
