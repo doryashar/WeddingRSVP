@@ -20,7 +20,7 @@ async def incoming(request: Request):
     if not res:
         logging.error(f"couldn't match phone from request")
     phone = res.group(1)
-    res = await db.add_error(message=f"incoming call from {phone}")
+    res = db.add_error(message=f"incoming call from {phone}")
     return Response(content=data, media_type="application/xml")    
     # return RedirectResponse(f"https://forms.fillout.com/t/xwYB5jKk1Gus?phone={phone}&name={name}", status_code=302)
 
