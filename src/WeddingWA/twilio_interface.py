@@ -10,7 +10,10 @@ async def incoming(request: Request):
     """ 
     # <Redirect>http://www.foo.com/nextInstructions</Redirect>
     # <Dial>972-548826569</Dial>
-    logging.info(f"Got request: {request}")
+    dat = await request.json()
+    logging.info(f"Got request: {dat}")
+    logging.info(f"Got request: {request.path_params}")
+    logging.info(f"Got request: {request.query_params}")
     # res = await db.update_tables_by(("phone", "972548826569"), tables=[db.MESSAGES_TABLE], message=f"")
     return Response(content=data, media_type="application/xml")    
     # return RedirectResponse(f"https://forms.fillout.com/t/xwYB5jKk1Gus?phone={phone}&name={name}", status_code=302)
