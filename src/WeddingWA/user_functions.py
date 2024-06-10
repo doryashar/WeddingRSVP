@@ -117,8 +117,8 @@ def clean_df(df):
     df['phone'] = df['phone'].apply(fix_phone) # clean_list['phone'].replace('[^0-9]','', regex=True,inplace=True)
     return df
 
-def filter_df(df, priority=1, state='None', days=None):
-    cond = lambda k:k['phone'] != '' and (priority is None or k['priority'] == priority) and (state is None or k['state'] == state) and (days is None or k['timestamp'] == '' or (datetime.now() - datetime.fromisoformat(k['timestamp'])).days > days)
+def filter_df(df, priority=1, state='None', status=None, days=None):
+    cond = lambda k:k['phone'] != '' and (priority is None or k['priority'] == priority) and (status is None or k['status'] == status) and (state is None or k['state'] == state) and (days is None or k['timestamp'] == '' or (datetime.now() - datetime.fromisoformat(k['timestamp'])).days > days)
     df = df[df.apply(cond, axis=1)]
     return df
 
@@ -130,12 +130,14 @@ def filter_df(df, priority=1, state='None', days=None):
 def invite_users(
     limit = 10,
     run_priority = None,
+    run_status = None,
     run_state = 'waiting', #'None'
     ):
     df, wks = get_list_of_invites()
     new_df = clean_df(df)
-    new_df = filter_df(df, run_priority, run_state)
-    logging.info(f"Sending {max(limit,len(new_df))} new invites")
+    new_df = filter_df(df, run_priority, run_state, status=run_status)
+    logging.info(f"Sending {min(limit,len(new_df))} new invites")
+    time.sleep(3)
     k = send_invitations(new_df, limit)
     if k:
         logging.info(f"Sent {k} invites. Saving new data")
@@ -213,17 +215,46 @@ def fix_table():
             logging.info(f"({phone}) No uid found")
     
 def main():
+    get_list_of_invites()
     
     # send_reminder('972542240380') #, 'אבי ערוסי')
-    # send_invite('972523484444', 'ריימן')
-    # message = 'היי ריימן, שלחתי לך זימון מחדש. מתחתנת הבת של שרית ישר.'
-    # res = requests.get(f"https://wedding.yashar.us/send-message/972523484444/{message}")
+    # numbers = [
+    #     '972548140447',
+    #     '972545422709',
+    #     '972543960378',
+    #     '972542822967',
+    #     '972528461846',
+    #     '972528333322',
+    #     '972528198271',
+    #     '972523957293',
+    #     '972503233339',
+    # ]
+    # for num in numbers:
+    #     send_invite(num, 'Noname')
+    
+    # send_invite('972507908082' , 'אורי ויינשטיין')
+    # send_invite('972544334435', 'רועי חינקיס')
+    # send_invite('972525733300', 'יקי עמירה')
+    
+    # message = 'היי אבי, זו הזמנה לחתונה של קובי ואקנין.'
+    # res = requests.get(f"https://wedding.yashar.us/send-message/972504815322/{message}")
     # print(res)
     
-    # send_reminder('972528444311')
+    # send_reminder('97252812526295
+    # 38250
+    # .........05263
+    # 4825632563265023
+    # 3232.325444311')
     # send_reminder('972528289303')
+
+    # invite_users(
+    #     run_status = 'sent',
+    #     run_state = 'remind', #'None'
+    # )
     
-    send_reminders()
+    send_reminders(
+        run_state='invite',
+    )
 
     # for phone_number in numbers:
     #     res = requests.get(f"https://wedding.yashar.us/send-template-id/0/invite-0/{phone_number}")
