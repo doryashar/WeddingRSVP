@@ -117,8 +117,8 @@ def clean_df(df):
     df['phone'] = df['phone'].apply(fix_phone) # clean_list['phone'].replace('[^0-9]','', regex=True,inplace=True)
     return df
 
-def filter_df(df, priority=1, state='None', status=None, days=None):
-    cond = lambda k:k['phone'] != '' and (priority is None or k['priority'] == priority) and (status is None or k['status'] == status) and (state is None or k['state'] == state) and (days is None or k['timestamp'] == '' or (datetime.now() - datetime.fromisoformat(k['timestamp'])).days > days)
+def filter_df(df, priority=1, state='None', status=None, hours=None):
+    cond = lambda k:k['phone'] != '' and (priority is None or k['priority'] == priority) and (status is None or k['status'] == status) and (state is None or k['state'] == state) and (hours is None or k['timestamp'] == '' or (datetime.now() - datetime.fromisoformat(k['timestamp'])).hours > hours)
     df = df[df.apply(cond, axis=1)]
     return df
 
@@ -163,13 +163,13 @@ def send_reminders(
     limit = None,
     run_priority = None,
     run_state = 'remind',
-    days=1
+    hours=1
     ):
 
     count = 0
     df, wks = get_list_of_invites()
     new_df = clean_df(df)
-    new_df = filter_df(new_df, run_priority, run_state, days=days)
+    new_df = filter_df(new_df, run_priority, run_state, hours=hours)
     logging.info(f"Will send reminders to \n{new_df['full name'][:limit]} out of {len(new_df)}")#}")
     time.sleep(5)
     
