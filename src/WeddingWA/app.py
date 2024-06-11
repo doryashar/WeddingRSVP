@@ -32,7 +32,7 @@ def verify_legal_send(template, wedding_row, invitee_row):
         elif invitee_row['state'] in ['remind', 'invite']:
             if invitee_row['status'] not in ['read', 'delivered', 'sent', 'accepted']:
                 pass
-            elif invitee_row['timestamp'] and (datetime.now() - datetime.fromisoformat(invitee_row['timestamp'])).days < 1:
+            elif invitee_row['timestamp'] and (datetime.now() - datetime.fromisoformat(invitee_row['timestamp'])).seconds < ONE_HOUR_IN_SECONDS:
                 return f"Too soon- Cannot send reminder to {invitee_row}"
         elif invitee_row['state'] not in ['invite', 'sent']: #TODO: remove the sent
             return f"Cannot send reminder to {invitee_row}"

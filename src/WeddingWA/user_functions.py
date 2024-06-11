@@ -7,6 +7,7 @@ import pandas as pd
 import re, time, os
 from datetime import datetime
 from dotenv import load_dotenv
+from common_types import *
 
 logging.basicConfig(
     level=logging.INFO,
@@ -118,7 +119,7 @@ def clean_df(df):
     return df
 
 def filter_df(df, priority=1, state='None', status=None, hours=None):
-    cond = lambda k:k['phone'] != '' and (priority is None or k['priority'] == priority) and (status is None or k['status'] == status) and (state is None or k['state'] == state) and (hours is None or k['timestamp'] == '' or (datetime.now() - datetime.fromisoformat(k['timestamp'])).hours > hours)
+    cond = lambda k:k['phone'] != '' and (priority is None or k['priority'] == priority) and (status is None or k['status'] == status) and (state is None or k['state'] == state) and (hours is None or k['timestamp'] == '' or (datetime.now() - datetime.fromisoformat(k['timestamp'])).seconds > (ONE_HOUR_IN_SECONDS * hours))
     df = df[df.apply(cond, axis=1)]
     return df
 

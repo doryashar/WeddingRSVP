@@ -1,5 +1,5 @@
 from typing import List
-
+ONE_HOUR_IN_SECONDS = 60*60
 
 YES_ATTENDING= "כן, אני אגיע!"
 NOT_ATTENDING ="לצערי לא אגיע"
