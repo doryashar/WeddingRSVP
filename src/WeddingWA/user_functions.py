@@ -162,13 +162,14 @@ def invite_users(
 def send_reminders(
     limit = None,
     run_priority = None,
-    run_state = 'remind'
+    run_state = 'remind',
+    days=1
     ):
 
     count = 0
     df, wks = get_list_of_invites()
     new_df = clean_df(df)
-    new_df = filter_df(new_df, run_priority, run_state, days=2)
+    new_df = filter_df(new_df, run_priority, run_state, days=days)
     logging.info(f"Will send reminders to \n{new_df['full name'][:limit]} out of {len(new_df)}")#}")
     time.sleep(5)
     
@@ -217,41 +218,24 @@ def fix_table():
 def main():
     get_list_of_invites()
     
-    # send_reminder('972542240380') #, 'אבי ערוסי')
     # numbers = [
     #     '972548140447',
     #     '972545422709',
-    #     '972543960378',
-    #     '972542822967',
-    #     '972528461846',
-    #     '972528333322',
-    #     '972528198271',
-    #     '972523957293',
-    #     '972503233339',
     # ]
     # for num in numbers:
     #     send_invite(num, 'Noname')
-    
-    # send_invite('972507908082' , 'אורי ויינשטיין')
-    # send_invite('972544334435', 'רועי חינקיס')
-    # send_invite('972525733300', 'יקי עמירה')
     
     # message = 'היי אבי, זו הזמנה לחתונה של קובי ואקנין.'
     # res = requests.get(f"https://wedding.yashar.us/send-message/972504815322/{message}")
     # print(res)
     
-    # send_reminder('97252812526295
-    # 38250
-    # .........05263
-    # 4825632563265023
-    # 3232.325444311')
     # send_reminder('972528289303')
+    # send_invite('972548171654', 'אלון ויימברג')
 
     # invite_users(
     #     run_status = 'sent',
     #     run_state = 'remind', #'None'
     # )
-    # send_invite('972548171654', 'אלון ויימברג')
     # time.sleep(60*60)
     
     send_reminders(
