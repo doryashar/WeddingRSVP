@@ -251,9 +251,11 @@ def main():
     #     run_status = 'sent',
     #     run_state = 'remind', #'None'
     # )
+    # send_invite('972548171654', 'אלון ויימברג')
+    # time.sleep(60*60)
     
     send_reminders(
-        run_state='invite',
+        run_state='remind',
     )
 
     # for phone_number in numbers:
