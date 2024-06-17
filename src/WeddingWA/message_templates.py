@@ -33,6 +33,7 @@ def get_wedding_day0(phone_number, name, host, date, hour, location, city, *args
     google_directions = f'directions_google'
     waze_directions = f'directions_waze'
     gift_link = f'https://wedding.yashar.us/gift'
+    when = 'היום'
     return  {
         'template':'wedding_day', 
         'recipient_id':phone_number, 
@@ -42,7 +43,7 @@ def get_wedding_day0(phone_number, name, host, date, hour, location, city, *args
                 "parameters": [
                 {
                     "type": "text",
-                    "text": "היום"
+                    "text": when
                 }
                 ] 
             },
@@ -51,6 +52,7 @@ def get_wedding_day0(phone_number, name, host, date, hour, location, city, *args
                 {"type": "text", "text": f'{city} ,{location}'},
                 {"type": "text", "text": host},
                 {"type": "text", "text": gift_link},
+                {"type": "text", "text": when},
                 ]
              },
             {"type": "button", "sub_type": "url", "index": "0", "parameters": [ {"type": "text", "text": google_directions}]},
