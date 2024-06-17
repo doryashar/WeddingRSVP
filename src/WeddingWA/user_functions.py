@@ -231,17 +231,21 @@ def main():
     # print(res)
     
     # send_reminder('972528289303')
-    # send_invite('972548171654', 'אלון ויימברג')
-
+    
+    # send_invite('972544509701','דליה רותם')
+    
+    # res = requests.get(f"https://wedding.yashar.us/send-wedding-day/972548826569")
+    
     # invite_users(
     #     run_status = 'sent',
     #     run_state = 'remind', #'None'
     # )
     # time.sleep(60*60)
     
-    send_reminders(
-        run_state='remind',
-    )
+    # send_reminders(
+    #     run_state='invite',
+    #     hours=12
+    # )
 
     # for phone_number in numbers:
     #     res = requests.get(f"https://wedding.yashar.us/send-template-id/0/invite-0/{phone_number}")

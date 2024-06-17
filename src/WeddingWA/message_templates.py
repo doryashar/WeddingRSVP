@@ -29,6 +29,37 @@ def get_invite0(phone_number, name, host, date, hour, location, city, header_ima
         'lang':"he"
     }
 
+def get_wedding_day0(phone_number, name, host, date, hour, location, city, *args, **kwargs):
+    google_directions = f'google_directions'
+    waze_directions = f'waze_directions'
+    gift_link = f'gift'
+    return  {
+        'template':'wedding_day', 
+        'recipient_id':phone_number, 
+        'components':[
+            {
+                "type": "header",
+                "parameters": [
+                {
+                    "type": "text",
+                    "text": "היום"
+                }
+                ] 
+            },
+            {"type": "body",  "parameters": [
+                {"type": "text", "text": hour},
+                {"type": "text", "text": f'{city} ,{location}'},
+                {"type": "text", "text": host},
+                {"type": "link", "text": gift_link},
+                ]
+             },
+            {"type": "button", "sub_type": "url", "index": "0", "parameters": [ {"type": "text", "text": google_directions}]},
+            {"type": "button", "sub_type": "url", "index": "1", "parameters": [ {"type": "text", "text": waze_directions}]},
+        ],
+        'lang':"he"
+    }
+
+
 def get_reminder0(phone_number, name, host, date, hour, location, city, *args, **kwargs):
     return  {
         'template':'wedding_reminder_1', 
@@ -41,7 +72,6 @@ def get_reminder0(phone_number, name, host, date, hour, location, city, *args, *
         ],
         'lang':"he"
     }
-
 templates = {
     'invite-0' : get_invite0,
     
@@ -71,6 +101,8 @@ templates = {
     'not-filled-0' : 'אנא כתבו מספר בלבד',
     'updated-0' : 'עדכנתי את הכמות ל-{confirmed} מוזמנים. להערות או שינויים, כתבו לי כאן!',
     'request_added-0' : 'אוקיי, רשמתי.',
+    
+    'wedding_day-0' : get_wedding_day0,
     
     'wedding_day_declined-0' : '',
     
