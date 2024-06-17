@@ -50,7 +50,7 @@ def get_wedding_day0(phone_number, name, host, date, hour, location, city, *args
                 {"type": "text", "text": hour},
                 {"type": "text", "text": f'{city} ,{location}'},
                 {"type": "text", "text": host},
-                {"type": "link", "text": gift_link},
+                {"type": "text", "text": gift_link},
                 ]
              },
             {"type": "button", "sub_type": "url", "index": "0", "parameters": [ {"type": "text", "text": google_directions}]},

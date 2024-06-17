@@ -234,8 +234,8 @@ def main():
     
     # send_invite('972544509701','דליה רותם')
     
-    # res = requests.get(f"https://wedding.yashar.us/send-wedding-day/972548826569")
-    
+    res = requests.get(f"https://wedding.yashar.us/send-wedding-day/972548826569")
+    print(res)
     # invite_users(
     #     run_status = 'sent',
     #     run_state = 'remind', #'None'
