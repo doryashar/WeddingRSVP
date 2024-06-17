@@ -36,6 +36,10 @@ def verify_legal_send(template, wedding_row, invitee_row):
                 return f"Too soon- Cannot send reminder to {invitee_row}"
         elif invitee_row['state'] not in ['invite', 'sent']: #TODO: remove the sent
             return f"Cannot send reminder to {invitee_row}"
+    # elif template_id == 'wedding_day':
+        # if invitee_row['state'] not in ['answered']:
+        #     return f"Wedding day message only for answered invitee: {invitee_row}"
+        # if invitee_row['confirmed']
     return None
     
 def get_new_state(curr_row, message, status):

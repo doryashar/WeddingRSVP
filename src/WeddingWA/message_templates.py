@@ -30,9 +30,9 @@ def get_invite0(phone_number, name, host, date, hour, location, city, header_ima
     }
 
 def get_wedding_day0(phone_number, name, host, date, hour, location, city, *args, **kwargs):
-    google_directions = f'google_directions'
-    waze_directions = f'waze_directions'
-    gift_link = f'gift'
+    google_directions = f'directions_google'
+    waze_directions = f'directions_waze'
+    gift_link = f'https://wedding.yashar.us/gift'
     return  {
         'template':'wedding_day', 
         'recipient_id':phone_number, 
