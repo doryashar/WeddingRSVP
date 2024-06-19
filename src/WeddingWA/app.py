@@ -311,7 +311,7 @@ async def get_google_directions(request: Request):
     return RedirectResponse(url, status_code=302)
 
 async def get_waze_directions(request: Request):
-    url = "https://waze.com/ul/hsv8tytzd0"
+    url = "https://www.waze.com/en/live-map/directions/il/center-district/%D7%A8%D7%90%D7%A9%D7%9C%D7%A6/duee-events-by-lago?place=ChIJm9qNsqmzAhURJysHnbI4yR0" #"https://waze.com/ul/hsv8tytzd0"
     return RedirectResponse(url, status_code=302)
 
 async def get_gift(request: Request):
