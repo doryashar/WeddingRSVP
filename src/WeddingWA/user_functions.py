@@ -118,8 +118,8 @@ def clean_df(df):
     df['phone'] = df['phone'].apply(fix_phone) # clean_list['phone'].replace('[^0-9]','', regex=True,inplace=True)
     return df
 
-def filter_df(df, priority=1, state='None', status=None, hours=None):
-    cond = lambda k:k['phone'] != '' and (priority is None or k['priority'] == priority) and (status is None or k['status'] == status) and (state is None or k['state'] == state) and (hours is None or k['timestamp'] == '' or (datetime.now() - datetime.fromisoformat(k['timestamp'])).seconds > (ONE_HOUR_IN_SECONDS * hours))
+def filter_df(df, priority=1, state='None', confirmed=None, status=None, hours=None):
+    cond = lambda k:k['phone'] != '' and (priority is None or k['priority'] == priority) and (status is None or k['status'] == status) and (state is None or k['state'] == state) and (confirmed is None or (not k['confirmed'] is None and str(k['confirmed']).isdigit() and int(k['confirmed']) >= confirmed)) and (hours is None or k['timestamp'] == '' or (datetime.now() - datetime.fromisoformat(k['timestamp'])).seconds > (ONE_HOUR_IN_SECONDS * hours))
     df = df[df.apply(cond, axis=1)]
     return df
 
@@ -217,8 +217,10 @@ def fix_table():
             logging.info(f"({phone}) No uid found")
     
 def main():
-    get_list_of_invites()
-    
+    df, wks = get_list_of_invites()
+    # df = clean_df(df)
+    new_df = filter_df(df, priority=None, state='answered', confirmed=1, status=None, hours=None)
+    print(new_df)
     # numbers = [
     #     '972548140447',
     #     '972545422709',
