@@ -58,6 +58,7 @@ def get_new_state(curr_row, message, status):
             'declined': 'answered',
             'wedding_day_declined': 'day-of-wedding-message',
             'wedding_day': 'wedding_day',
+            'post-wedding-message': 'wedding_day',
             'post_wedding': 'post_wedding',
         }.get(template, None)
         if res:
