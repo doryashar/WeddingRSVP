@@ -57,7 +57,7 @@ def get_new_state(curr_row, message, status):
             'any_other': 'answered',
             'declined': 'answered',
             'wedding_day_declined': 'day-of-wedding-message',
-            'wedding_day_accepted': 'post-wedding-message',
+            'wedding_day': 'post-wedding-message',
             'post_wedding': '',
         }.get(template, None)
         if res:
@@ -307,11 +307,11 @@ async def get_google_calendar(request: Request):
     return RedirectResponse(url, status_code=302)
 
 async def get_google_directions(request: Request):
-    url = "https://maps.app.goo.gl/9y8sgUUzNFgCapZk8"
+    url = 'https://maps.app.goo.gl/brP6eifxmW6i9roB7' #"https://maps.app.goo.gl/9y8sgUUzNFgCapZk8" #
     return RedirectResponse(url, status_code=302)
 
 async def get_waze_directions(request: Request):
-    url = "https://calendar.google.com/calendar/event?action=TEMPLATE&tmeid=N2I4MmxmcG11aWNhdXI2ZWZwZnAwa3JiZGMgZDAzY2Y2Y2NjZDU5YTYzMGQ4NTQ0YTBkY2RjOTIwODA4NWM0MzQyN2IxNTU0Nzk1YTQwYTZkMzZmM2JlOTY4Y0Bn&tmsrc=d03cf6cccd59a630d8544a0dcdc9208085c43427b1554795a40a6d36f3be968c%40group.calendar.google.com"
+    url = "https://waze.com/ul/hsv8tytzd0"
     return RedirectResponse(url, status_code=302)
 
 async def get_gift(request: Request):
