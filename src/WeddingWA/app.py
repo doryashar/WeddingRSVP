@@ -57,8 +57,8 @@ def get_new_state(curr_row, message, status):
             'any_other': 'answered',
             'declined': 'answered',
             'wedding_day_declined': 'day-of-wedding-message',
-            'wedding_day': 'post-wedding-message',
-            'post_wedding': '',
+            'wedding_day': 'wedding_day',
+            'post_wedding': 'post_wedding',
         }.get(template, None)
         if res:
             return res
@@ -109,7 +109,7 @@ def update_fields(fields, message, curr_row):
     elif curr_row['state'] in ['invite', 'remind', 'followup-guest-num', 'answered'] and message.isdigit(): #message == YES_ATTENDING:
         fields['confirmed'] = message
     
-    if curr_row['state'] in ['invite', 'remind', 'followup-guest-num', 'answered'] and not message.isdigit() and message not in [YES_ATTENDING, NOT_ATTENDING, MAYBE_ATTENDING]:
+    if curr_row['state'] in ['invite', 'remind', 'followup-guest-num', 'answered', 'post-wedding-message', 'wedding-day'] and not message.isdigit() and message not in [YES_ATTENDING, NOT_ATTENDING, MAYBE_ATTENDING]:
         fields['requests'] = curr_row['requests'] + '\n' + message if curr_row['requests'] else message
                 
 # =============================================================================== #

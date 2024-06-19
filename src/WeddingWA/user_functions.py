@@ -221,6 +221,20 @@ def main():
     # df = clean_df(df)
     new_df = filter_df(df, priority=None, state='answered', confirmed=1, status=None, hours=None)
     print(new_df)
+    logging.info(f"Will send wedding_day msg to \n{new_df['full name']} out of {len(new_df)}")#}")
+    time.sleep(5)
+    count = 0
+    for i, row in new_df.iterrows():
+        logging.info(f"Sending wedding_day msg to {row['phone']}")   
+        res = requests.get(f"https://wedding.yashar.us/send-wedding-day/{row['phone']}")
+        logging.info(res)
+        if res.status_code == 200:
+            count += 1
+        time.sleep(2)
+    logging.info(f"Sent {count} reminders")
+    
+    
+    
     # numbers = [
     #     '972548140447',
     #     '972545422709',
@@ -236,8 +250,8 @@ def main():
     
     # send_invite('972544509701','דליה רותם')
     
-    res = requests.get(f"https://wedding.yashar.us/send-wedding-day/972548826569")
-    print(res)
+    
+    
     # invite_users(
     #     run_status = 'sent',
     #     run_state = 'remind', #'None'
