@@ -219,7 +219,7 @@ def fix_table():
 def main():
     df, wks = get_list_of_invites()
     # df = clean_df(df)
-    new_df = filter_df(df, priority=None, state='answered', confirmed=1, status=None, hours=None)
+    new_df = filter_df(df, priority=None, state='called', confirmed=None, status=None, hours=None)
     print(new_df)
     logging.info(f"Will send wedding_day msg to \n{new_df['full name']} out of {len(new_df)}")#}")
     time.sleep(5)
@@ -230,7 +230,7 @@ def main():
         logging.info(res)
         if res.status_code == 200:
             count += 1
-        time.sleep(2)
+        # time.sleep(2)
     logging.info(f"Sent {count} reminders")
     
     
